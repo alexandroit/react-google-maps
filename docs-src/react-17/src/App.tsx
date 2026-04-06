@@ -196,7 +196,7 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
     typeof window !== 'undefined' ? window.localStorage.getItem(MAP_ID_STORAGE_KEY) || DEFAULT_MAP_ID : DEFAULT_MAP_ID
   );
   const [liveMode, setLiveMode] = useState(false);
-  const [selectedId, setSelectedId] = useState('marker-clusterer');
+  const [selectedId, setSelectedId] = useState('basic-roadmap');
   const [logEntries, setLogEntries] = useState<string[]>(() => [stamp(`Loaded docs line ${reactLine}.`)]);
   const normalizedApiKey = apiKey.trim();
   const hasLiveApiKey = isLiveApiKey(normalizedApiKey);
@@ -238,8 +238,8 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
     () => [
       {
         id: 'basic-roadmap',
-        category: 'Getting Started',
-        title: 'Basic roadmap map',
+        category: 'Test menu',
+        title: 'Basic map bootstrapping',
         description: 'The smallest useful setup: provider, map container, center, zoom, and a single marker.',
         code: codeExample(
           'Basic roadmap',
@@ -259,8 +259,8 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
       },
       {
         id: 'controlled-camera',
-        category: 'Getting Started',
-        title: 'Controlled camera',
+        category: 'Test menu',
+        title: 'Controlled center and zoom',
         description: 'Drive center and zoom from React state and keep the map in sync with UI buttons.',
         code: codeExample(
           'Controlled camera',
@@ -273,8 +273,8 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'map-events',
-        category: 'Getting Started',
-        title: 'Map click events',
+        category: 'Test menu',
+        title: 'Click events',
         description: 'Click the map to drop markers and log the clicked latitude and longitude.',
         code: codeExample(
           'Map click events',
@@ -287,7 +287,7 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'marker-info-window',
-        category: 'Markers',
+        category: 'Test menu',
         title: 'Markers and info windows',
         description: 'Use state-driven info windows with familiar marker click interactions.',
         code: codeExample(
@@ -301,8 +301,8 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'advanced-markers',
-        category: 'Markers',
-        title: 'Advanced markers with HTML',
+        category: 'Test menu',
+        title: 'Advanced markers',
         description: 'Render rich marker content without dropping down to imperative DOM management.',
         note: 'Advanced markers require a mapId. The docs default to DEMO_MAP_ID so you can test quickly.',
         code: codeExample(
@@ -335,8 +335,8 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'draggable-marker',
-        category: 'Markers',
-        title: 'Draggable marker',
+        category: 'Test menu',
+        title: 'Draggable markers',
         description: 'Track user drag interactions with a migration-friendly marker API.',
         code: codeExample(
           'Draggable marker',
@@ -350,7 +350,7 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'marker-clusterer',
-        category: 'Markers',
+        category: 'Test menu',
         title: 'Marker clustering',
         description: 'Cluster many points with the official Google Maps markerclusterer package.',
         code: codeExample(
@@ -375,7 +375,7 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'custom-cluster-html',
-        category: 'Markers',
+        category: 'Advanced customization',
         title: 'Advanced markers + custom cluster HTML',
         description: 'Use advanced markers together with a custom cluster renderer so both individual pins and aggregated clusters can be fully branded.',
         note: 'This example uses the same official markerclusterer package, but wraps the renderer with a React-friendly helper.',
@@ -399,98 +399,25 @@ const [zoom, setZoom] = useState(10);
         )
       },
       {
-        id: 'polyline',
-        category: 'Shapes & Overlays',
-        title: 'Polyline route',
-        description: 'Render a route-like polyline with interaction callbacks.',
+        id: 'geometry-shapes',
+        category: 'Test menu',
+        title: 'Polylines, polygons, rectangles, circles',
+        description: 'Render the full geometry toolbox in one map so teams can validate path, area, bounds, and radius flows together.',
         code: codeExample(
-          'Polyline',
-          `<MapPolyline
-  path={[TORONTO, OTTAWA, MONTREAL]}
-  options={{ strokeColor: '#1f5ba7', strokeWeight: 4 }}
-/>`
+          'Geometry toolbox',
+          `<GoogleMap center={OTTAWA} zoom={6} height={420}>
+  <MapPolyline path={[TORONTO, OTTAWA, MONTREAL]} />
+  <MapPolygon paths={polygonPaths} />
+  <MapRectangle bounds={bounds} />
+  <MapCircle center={TORONTO} radius={12000} />
+</GoogleMap>`
         ),
-        render: ({ apiKey, mapId, pushLog }) => (
-          <DemoSurface apiKey={apiKey} mapId={mapId}>
-            <GoogleMap center={OTTAWA} zoom={6} height={420}>
-              <MapPolyline
-                path={[TORONTO, OTTAWA, MONTREAL]}
-                options={{ strokeColor: '#1f5ba7', strokeWeight: 4, geodesic: true }}
-                onClick={() => pushLog('Polyline clicked.')}
-              />
-              <MapMarker position={TORONTO} />
-              <MapMarker position={OTTAWA} />
-              <MapMarker position={MONTREAL} />
-            </GoogleMap>
-          </DemoSurface>
-        )
-      },
-      {
-        id: 'polygon',
-        category: 'Shapes & Overlays',
-        title: 'Polygon area',
-        description: 'Model an area with a clickable polygon and semi-transparent fill.',
-        code: codeExample(
-          'Polygon',
-          `<MapPolygon
-  paths={[TORONTO, OTTAWA, MONTREAL]}
-  options={{ fillColor: '#0d5c9e', fillOpacity: 0.18 }}
-/>`
-        ),
-        render: ({ apiKey, mapId, pushLog }) => (
-          <DemoSurface apiKey={apiKey} mapId={mapId}>
-            <GoogleMap center={OTTAWA} zoom={6} height={420}>
-              <MapPolygon
-                paths={[
-                  { lat: 44.8, lng: -79.9 },
-                  { lat: 46.2, lng: -79.2 },
-                  { lat: 45.8, lng: -72.8 },
-                  { lat: 43.9, lng: -74.3 }
-                ]}
-                options={{
-                  fillColor: '#0d5c9e',
-                  fillOpacity: 0.18,
-                  strokeColor: '#1f5ba7',
-                  strokeWeight: 3
-                }}
-                onClick={() => pushLog('Polygon clicked.')}
-              />
-            </GoogleMap>
-          </DemoSurface>
-        )
-      },
-      {
-        id: 'rectangle-circle',
-        category: 'Shapes & Overlays',
-        title: 'Rectangle and circle',
-        description: 'Use rectangle and circle overlays together for coverage or search radius workflows.',
-        code: codeExample(
-          'Rectangle and circle',
-          `<MapRectangle bounds={bounds} />
-<MapCircle center={TORONTO} radius={14000} />`
-        ),
-        render: ({ apiKey, mapId, pushLog }) => (
-          <DemoSurface apiKey={apiKey} mapId={mapId}>
-            <GoogleMap center={TORONTO} zoom={11} height={420}>
-              <MapRectangle
-                bounds={{ north: 43.72, south: 43.60, east: -79.30, west: -79.48 }}
-                options={{ strokeColor: '#b43f3f', fillColor: '#f4b7b7', fillOpacity: 0.15 }}
-                onClick={() => pushLog('Rectangle clicked.')}
-              />
-              <MapCircle
-                center={TORONTO}
-                radius={12000}
-                options={{ strokeColor: '#30a46c', fillColor: '#8ad7b0', fillOpacity: 0.14 }}
-                onClick={() => pushLog('Circle clicked.')}
-              />
-            </GoogleMap>
-          </DemoSurface>
-        )
+        render: ({ apiKey, mapId, pushLog }) => <GeometryShapesExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
       },
       {
         id: 'ground-overlay',
-        category: 'Shapes & Overlays',
-        title: 'Ground overlay',
+        category: 'Test menu',
+        title: 'Ground overlays',
         description: 'Place an image overlay on top of a map area with a declarative component.',
         code: codeExample(
           'Ground overlay',
@@ -514,8 +441,8 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'transport-layers',
-        category: 'Layers',
-        title: 'Traffic, transit, and bicycling',
+        category: 'Test menu',
+        title: 'Traffic, transit, and bicycling layers',
         description: 'Toggle Google’s live transportation layers without leaving declarative React.',
         code: codeExample(
           'Transportation layers',
@@ -527,8 +454,8 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'kml-layer',
-        category: 'Layers',
-        title: 'KML layer',
+        category: 'Test menu',
+        title: 'KML layers',
         description: 'Load a remote KML feed through the same React composition model.',
         code: codeExample(
           'KML layer',
@@ -547,8 +474,8 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'heatmap-layer',
-        category: 'Layers',
-        title: 'Heatmap layer',
+        category: 'Test menu',
+        title: 'Heatmaps',
         description: 'Render weighted heatmap data for density-based visualizations.',
         code: codeExample(
           'Heatmap',
@@ -577,8 +504,8 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'directions',
-        category: 'Services',
-        title: 'Directions service + renderer',
+        category: 'Test menu',
+        title: 'Directions',
         description: 'Keep route requests declarative with a renderless service component and a visual renderer.',
         note: 'This example requires the Directions API to be enabled for the API key in Google Cloud.',
         code: codeExample(
@@ -590,8 +517,8 @@ const [zoom, setZoom] = useState(10);
       },
       {
         id: 'geocoder',
-        category: 'Services',
-        title: 'Geocoding with a hook',
+        category: 'Test menu',
+        title: 'Geocoding',
         description: 'Use a React hook for address lookup and update the map with the geocoded result.',
         note: 'This example requires the Geocoding API to be enabled for the API key in Google Cloud.',
         code: codeExample(
@@ -603,8 +530,8 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
       },
       {
         id: 'custom-control',
-        category: 'Controls',
-        title: 'Custom map control + imperative fit bounds',
+        category: 'Advanced customization',
+        title: 'Custom map controls and fitBounds',
         description: 'Compose React controls inside the map UI and still expose the native map handle for advanced flows.',
         code: codeExample(
           'Custom control',
@@ -722,8 +649,8 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
       <section className="docs-layout">
         <aside className="docs-sidebar">
           <div className="panel docs-nav-panel">
-            <h2>Examples</h2>
-            <p>Choose an example and the main Google Maps preview at the top of the page updates immediately.</p>
+            <h2>Test menu</h2>
+            <p>Use this as a practical checklist. Click a test and the example workbench updates immediately with that Google Maps scenario.</p>
             <div className="docs-nav examples-nav">
               {groupedExamples.map((group) => (
                 <section key={group.category} className="demo-group">
@@ -1125,7 +1052,12 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
 }
 
 function groupExamples(examples: ExampleDefinition[]) {
-  const order = Array.from(new Set(examples.map((example) => example.category)));
+  const preferredOrder = ['Test menu', 'Advanced customization'];
+  const discovered = Array.from(new Set(examples.map((example) => example.category)));
+  const order = [
+    ...preferredOrder.filter((category) => discovered.includes(category)),
+    ...discovered.filter((category) => !preferredOrder.includes(category))
+  ];
   return order.map((category) => ({
     category,
     items: examples.filter((example) => example.category === category)
@@ -1442,6 +1374,49 @@ function DraggableMarkerExample({ apiKey, mapId, pushLog }: ExampleContext) {
             }
           }}
         />
+      </GoogleMap>
+    </DemoSurface>
+  );
+}
+
+function GeometryShapesExample({ apiKey, mapId, pushLog }: ExampleContext) {
+  return (
+    <DemoSurface apiKey={apiKey} mapId={mapId}>
+      <GoogleMap center={OTTAWA} zoom={6} height={420}>
+        <MapPolyline
+          path={[TORONTO, OTTAWA, MONTREAL]}
+          options={{ strokeColor: '#1f5ba7', strokeWeight: 4, geodesic: true }}
+          onClick={() => pushLog('Polyline clicked.')}
+        />
+        <MapPolygon
+          paths={[
+            { lat: 44.8, lng: -79.9 },
+            { lat: 46.2, lng: -79.2 },
+            { lat: 45.8, lng: -72.8 },
+            { lat: 43.9, lng: -74.3 }
+          ]}
+          options={{
+            fillColor: '#0d5c9e',
+            fillOpacity: 0.18,
+            strokeColor: '#1f5ba7',
+            strokeWeight: 3
+          }}
+          onClick={() => pushLog('Polygon clicked.')}
+        />
+        <MapRectangle
+          bounds={{ north: 45.74, south: 45.26, east: -73.18, west: -75.96 }}
+          options={{ strokeColor: '#b43f3f', fillColor: '#f4b7b7', fillOpacity: 0.12 }}
+          onClick={() => pushLog('Rectangle clicked.')}
+        />
+        <MapCircle
+          center={TORONTO}
+          radius={12000}
+          options={{ strokeColor: '#30a46c', fillColor: '#8ad7b0', fillOpacity: 0.14 }}
+          onClick={() => pushLog('Circle clicked.')}
+        />
+        <MapMarker position={TORONTO} title="Toronto" />
+        <MapMarker position={OTTAWA} title="Ottawa" />
+        <MapMarker position={MONTREAL} title="Montreal" />
       </GoogleMap>
     </DemoSurface>
   );
