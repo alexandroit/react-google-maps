@@ -52,7 +52,6 @@ const API_KEY_STORAGE_KEY = '@revivejs/react-google-maps/demo-api-key';
 const MAP_ID_STORAGE_KEY = '@revivejs/react-google-maps/demo-map-id';
 const DEFAULT_MAP_ID = 'DEMO_MAP_ID';
 const DEFAULT_DEMO_API_KEY = 'NoValidNoValidNoValidNoValidNoValidNoVa';
-const WRAPPER_NO_KEY_PREVIEW_PATH = './wrapper-no-key.html';
 
 const INSTALL_CODE = `npm install @revivejs/react-google-maps`;
 
@@ -185,7 +184,7 @@ const DOC_SECTIONS = [
   { id: 'migration', label: 'Migration Guide' },
   { id: 'marker-model', label: 'Marker Strategy' },
   { id: 'customization', label: 'Customization' },
-  { id: 'examples', label: 'Selected Example' },
+  { id: 'examples', label: 'Example Workbench' },
   { id: 'api-reference', label: 'API Reference' }
 ] as const;
 
@@ -643,18 +642,18 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
           <div className="map-showcase hero-map-showcase">
             <div className="map-showcase__header">
               <div>
-                <span className="meta-pill light">{selected.category}</span>
-                <h3>{selected.title}</h3>
+                <span className="meta-pill light">Hero showcase</span>
+                <h3>Google Maps first look</h3>
                 <p>
                   {isDevPreview
-                    ? `This is the main preview surface for the ${selected.title} example. In mock mode the structure stays visible and you can still navigate every example from the left menu.`
-                    : `This is the main live preview for ${selected.title}. Use the left menu to switch between markers, polygons, clustering, directions, and the rest of the examples.`}
+                    ? 'This hero map is the visual front door of the docs. The detailed testing surface lives below in the example workbench, where the left menu drives every map scenario.'
+                    : 'This hero map is a curated live showcase. Use the example workbench below to switch between markers, polygons, clustering, directions, controls, and every other test.'}
                 </p>
-                {selected.note ? <p className="demo-note">{selected.note}</p> : null}
+                <p className="demo-note">Use the big example workbench below for real testing. The hero stays focused on first impression.</p>
               </div>
             </div>
             <div className="quickstart-demo">
-              {selected.render({ apiKey: runtimeApiKey, mapId, pushLog })}
+              <HeroShowcasePreview apiKey={runtimeApiKey} mapId={mapId} pushLog={pushLog} />
             </div>
           </div>
 
@@ -679,7 +678,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
           </div>
 
           <div className="cta-row">
-            <a className="btn" href="#examples">Selected example code</a>
+            <a className="btn" href="#examples">Open example workbench</a>
             <a className="btn secondary" href="https://github.com/alexandroit/react-google-maps#readme" target="_blank" rel="noreferrer">
               README
             </a>
@@ -762,7 +761,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
           </div>
         </aside>
 
-        <section className="layout" id="examples">
+        <section className="layout">
         <div className="panels">
           <article className="panel quickstart-panel" id="quickstart">
             <div className="panel-header">
@@ -957,42 +956,56 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             </div>
           </article>
 
-          <article className="panel" id="examples">
+          <article className="panel example-workbench" id="examples">
             <div className="panel-header">
-              <h2>Selected example</h2>
+              <h2>Example workbench</h2>
               <p>
-                The code below belongs to the example currently selected in the left menu. Change the menu item and both the code and the main map at the top of the page change together.
+                Pick any example from the left menu and it renders right here in a dedicated test surface. This is the main place to validate markers, polygons, clustering, directions, overlays, and controls.
               </p>
             </div>
 
             <div className="selected-example-panel">
-              <div className="demo-stage-header">
-                <div className="demo-breadcrumb">
-                  <span className="meta-pill">{selected.category}</span>
-                  <span className="meta-pill light">{reactLine}</span>
+              <div className="example-workbench__summary">
+                <div className="demo-stage-header">
+                  <div className="demo-breadcrumb">
+                    <span className="meta-pill">{selected.category}</span>
+                    <span className="meta-pill light">{reactLine}</span>
+                  </div>
+                  <h3>{selected.title}</h3>
+                  <p>{selected.description}</p>
+                  {selected.note ? <p className="demo-note">{selected.note}</p> : null}
                 </div>
-                <h3>{selected.title}</h3>
-                <p>{selected.description}</p>
-                {selected.note ? <p className="demo-note">{selected.note}</p> : null}
+                <div className="example-workbench__summary-card">
+                  <strong>How to use this area</strong>
+                  <p>The menu on the left switches the test case. The map below is the single workbench for all supported Google Maps scenarios in this docs line.</p>
+                </div>
               </div>
 
-              <div className="demo-card demo-card--code">
-                <CodeBlock title={`${selected.title} example`} code={selected.code} soft />
+              <div className="example-workbench__map">
+                {selected.render({ apiKey: runtimeApiKey, mapId, pushLog })}
               </div>
 
-              {isDevPreview ? (
-                <div className="inline-note inline-note--dev">
-                  <strong>This example is currently running in mock API mode.</strong>
-                  <p>
-                    The page still switches examples correctly, but the real map behavior requires a browser key. Add a real key above and the top preview will immediately start rendering the selected live example.
-                  </p>
+              <div className="example-workbench__details">
+                <div className="example-workbench__note">
+                  {isDevPreview ? (
+                    <div className="inline-note inline-note--dev">
+                      <strong>Mock API mode is active for this example.</strong>
+                      <p>
+                        The workbench still switches examples correctly, but real Google Maps runtime behavior needs a browser key. Add a real key above and this exact stage will render the selected live example immediately.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="inline-note inline-note--ready">
+                      <strong>Live example active.</strong>
+                      <p>This workbench is currently running {selected.title}. Use the left menu to test a different live Google Maps behavior in the same stage.</p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="inline-note inline-note--ready">
-                  <strong>Live example active.</strong>
-                  <p>The top map is currently running {selected.title}. Switch examples from the left menu to test a different live Google Maps behavior instantly.</p>
+
+                <div className="demo-card demo-card--code">
+                  <CodeBlock title={`${selected.title} example`} code={selected.code} soft />
                 </div>
-              )}
+              </div>
             </div>
           </article>
 
@@ -1155,40 +1168,61 @@ function CodeBlock({
   );
 }
 
-function ClassicQuickStartPreview({
+function HeroShowcasePreview({
   apiKey,
   mapId,
-  isDevPreview,
   pushLog
 }: {
   apiKey: string;
   mapId: string;
-  isDevPreview: boolean;
   pushLog: (message: string) => void;
 }) {
-  if (isDevPreview) {
-    return (
-      <div className="classic-preview-stack">
-        <ClassicNoKeyPreview />
-        <div className="inline-note inline-note--dev">
-          <strong>Wrapper no-key preview is active.</strong>
-          <p>
-            This isolated page boots <code>GoogleMapsProvider</code>, <code>GoogleMap</code>, and <code>MapMarker</code> with no key.
-            It lets you validate the actual wrapper behavior without forcing the main docs app to load Google Maps globally.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const heroPoints = useMemo(() => CLUSTER_POINTS.slice(0, 18), []);
 
   return (
     <DemoSurface apiKey={apiKey} mapId={mapId}>
-      <GoogleMap center={NEW_YORK} zoom={11} height={420}>
-        <MapMarker
-          position={NEW_YORK}
-          title="New York City"
-          onClick={() => pushLog('Classic quick start marker clicked.')}
+      <GoogleMap center={SAN_FRANCISCO} zoom={9} mapId={mapId} height={460}>
+        <MapPolygon
+          paths={[
+            { lat: 37.92, lng: -122.58 },
+            { lat: 37.86, lng: -122.25 },
+            { lat: 37.68, lng: -122.17 },
+            { lat: 37.64, lng: -122.52 }
+          ]}
+          options={{
+            fillColor: '#1f5ba7',
+            fillOpacity: 0.12,
+            strokeColor: '#1f5ba7',
+            strokeWeight: 3
+          }}
         />
+
+        <MapCircle
+          center={SAN_FRANCISCO}
+          radius={26000}
+          options={{
+            fillColor: '#d24b2a',
+            fillOpacity: 0.08,
+            strokeColor: '#d24b2a',
+            strokeWeight: 2
+          }}
+        />
+
+        <MapMarkerClusterer onClusterClick={() => pushLog('Hero showcase cluster clicked.')}>
+          {heroPoints.map((point, index) => (
+            <MapAdvancedMarker
+              key={`hero-${point.lat}-${point.lng}-${index}`}
+              position={point}
+              title={`Hero marker ${index + 1}`}
+              onClick={() => pushLog(`Hero showcase marker ${index + 1} clicked.`)}
+            >
+              <div className="marker-chip marker-chip--mini">
+                <strong>{index + 1}</strong>
+                <span>Spot</span>
+              </div>
+            </MapAdvancedMarker>
+          ))}
+        </MapMarkerClusterer>
       </GoogleMap>
     </DemoSurface>
   );
@@ -1213,18 +1247,6 @@ function DemoSurface({
     <GoogleMapsProvider apiKey={normalizedApiKey} mapIds={[mapId]} libraries={['marker', 'places', 'geometry', 'visualization']}>
       {children}
     </GoogleMapsProvider>
-  );
-}
-
-function ClassicNoKeyPreview() {
-  return (
-    <iframe
-      className="classic-preview-frame"
-      title="React Google Maps wrapper no-key preview"
-      src={WRAPPER_NO_KEY_PREVIEW_PATH}
-      loading="lazy"
-      referrerPolicy="no-referrer"
-    />
   );
 }
 
