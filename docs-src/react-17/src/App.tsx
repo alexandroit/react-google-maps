@@ -136,14 +136,6 @@ const INDEX_HTML_CODE = `<!-- index.html -->
   });
 </script>`;
 
-const MIGRATION_CODE = `// Angular-style mental model, React-friendly surface:
-// - <GoogleMap center={...} zoom={...} />
-// - <MapAdvancedMarker position={...}>...</MapAdvancedMarker>
-// - <MapInfoWindow anchor={marker} open={open} />
-// - <MapMarkerClusterer>...</MapMarkerClusterer>
-// - MapDirectionsService + MapDirectionsRenderer
-// - useMapGeocoder() for geocoding flows`;
-
 const REF_CODE = `const mapRef = useRef<GoogleMapHandle>(null);
 const markerRef = useRef<MapAdvancedMarkerHandle>(null);
 
@@ -748,13 +740,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             </div>
 
             <div className="guide-grid guide-grid--two">
-              <div className="field-card">
-                <span>Mental model</span>
-                <p>Think of it as a declarative shell around the same native objects you already know.</p>
-                <CodeBlock title="Migration mental model" code={MIGRATION_CODE} />
-              </div>
-
-              <div className="field-card">
+              <div className="field-card field-card--span">
                 <span>Imperative escape hatch</span>
                 <p>When an app needs full control, use refs and native handles instead of breaking out of the wrapper entirely.</p>
                 <CodeBlock title="Imperative refs and handles" code={REF_CODE} />
