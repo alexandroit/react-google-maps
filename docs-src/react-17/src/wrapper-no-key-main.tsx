@@ -6,9 +6,6 @@ import {
   MapCircle,
   MapControl,
   MapGroundOverlay,
-  MapInfoWindow,
-  MapMarker,
-  MapMarkerClusterer,
   MapPolygon,
   MapPolyline,
   MapRectangle,
@@ -21,16 +18,9 @@ const MONTREAL = { lat: 45.5017, lng: -73.5673 };
 const OTTAWA = { lat: 45.4215, lng: -75.6972 };
 const NEW_YORK = { lat: 40.7128, lng: -74.006 };
 const SAN_FRANCISCO = { lat: 37.7749, lng: -122.4194 };
+const NO_KEY_MAP_ID = 'DEMO_MAP_ID';
 
-function randomPoints(center: google.maps.LatLngLiteral, count: number) {
-  return Array.from({ length: count }, (_, index) => ({
-    lat: center.lat + Math.sin(index * 1.17) * 0.12 + ((index % 3) - 1) * 0.01,
-    lng: center.lng + Math.cos(index * 0.93) * 0.12 + ((index % 5) - 2) * 0.008
-  }));
-}
-
-const CLUSTER_POINTS = randomPoints(SAN_FRANCISCO, 24);
-const exampleId = new URLSearchParams(window.location.search).get('example') || 'basic-roadmap';
+const exampleId = new URLSearchParams(window.location.search).get('example') || 'advanced-markers';
 
 type PreviewDefinition = {
   render: () => React.ReactNode;
@@ -54,11 +44,7 @@ function getPreviewDefinition(id: string): PreviewDefinition {
       };
     case 'basic-roadmap':
       return {
-        render: () => (
-          <GoogleMap center={NEW_YORK} zoom={11} height={460}>
-            <MapMarker position={NEW_YORK} title="New York City" />
-          </GoogleMap>
-        )
+        render: () => <BasicRoadmapNoKeyPreview />
       };
     case 'controlled-camera':
       return {
@@ -127,48 +113,10 @@ function getPreviewDefinition(id: string): PreviewDefinition {
   }
 }
 
-function HeroNoKeyPreview() {
-  return (
-    <GoogleMap center={SAN_FRANCISCO} zoom={9} height={460}>
-      <MapPolygon
-        paths={[
-          { lat: 37.92, lng: -122.58 },
-          { lat: 37.86, lng: -122.25 },
-          { lat: 37.68, lng: -122.17 },
-          { lat: 37.64, lng: -122.52 }
-        ]}
-        options={{
-          fillColor: '#1f5ba7',
-          fillOpacity: 0.12,
-          strokeColor: '#1f5ba7',
-          strokeWeight: 3
-        }}
-      />
-      <MapCircle
-        center={SAN_FRANCISCO}
-        radius={26000}
-        options={{
-          fillColor: '#d24b2a',
-          fillOpacity: 0.08,
-          strokeColor: '#d24b2a',
-          strokeWeight: 2
-        }}
-      />
-      <MapMarkerClusterer>
-        {CLUSTER_POINTS.map((point, index) => (
-          <MapMarker key={`hero-${index}`} position={point} title={`Spot ${index + 1}`} />
-        ))}
-      </MapMarkerClusterer>
-    </GoogleMap>
-  );
-}
-
 function AdvancedMarkersNoKeyPreview({ variant }: { variant: 'hero' | 'workbench' }) {
   return (
     <div className={`wrapper-overlay-stage wrapper-overlay-stage--${variant}`}>
-      <GoogleMap center={OTTAWA} zoom={6} height={variant === 'hero' ? 460 : 420}>
-        <MapMarker position={OTTAWA} title="Ottawa anchor" />
-        <MapMarker position={MONTREAL} title="Montreal anchor" />
+      <GoogleMap center={OTTAWA} zoom={6} mapId={NO_KEY_MAP_ID} height={variant === 'hero' ? 460 : 420}>
       </GoogleMap>
 
       <div className="wrapper-advanced-card wrapper-advanced-card--a">
@@ -195,6 +143,7 @@ function ControlledNoKeyPreview() {
   const [center, setCenter] = useState(TORONTO);
   const [zoom, setZoom] = useState(10);
   const topCenter = ((window as any).google?.maps?.ControlPosition?.TOP_CENTER ?? 2) as google.maps.ControlPosition;
+  const bottomCenter = ((window as any).google?.maps?.ControlPosition?.BOTTOM_CENTER ?? 11) as google.maps.ControlPosition;
 
   return (
     <GoogleMap center={center} zoom={zoom} height={420}>
@@ -207,13 +156,19 @@ function ControlledNoKeyPreview() {
           <button type="button" onClick={() => setZoom((value) => Math.max(value - 1, 4))}>-</button>
         </div>
       </MapControl>
-      <MapMarker position={center} title="Selected city" />
+      <MapControl position={bottomCenter}>
+        <div className="wrapper-preview-tag">{`Center: ${center.lat.toFixed(2)}, ${center.lng.toFixed(2)} · Zoom ${zoom}`}</div>
+      </MapControl>
     </GoogleMap>
   );
 }
 
 function ClickEventsNoKeyPreview() {
-  const [markers, setMarkers] = useState([TORONTO, OTTAWA]);
+  const [clicks, setClicks] = useState<string[]>([
+    `${TORONTO.lat.toFixed(2)}, ${TORONTO.lng.toFixed(2)}`,
+    `${OTTAWA.lat.toFixed(2)}, ${OTTAWA.lng.toFixed(2)}`
+  ]);
+  const topRight = ((window as any).google?.maps?.ControlPosition?.TOP_RIGHT ?? 3) as google.maps.ControlPosition;
 
   return (
     <GoogleMap
@@ -223,13 +178,19 @@ function ClickEventsNoKeyPreview() {
       onClick={(event) => {
         const next = event.latLng?.toJSON();
         if (next) {
-          setMarkers((current) => [...current, next]);
+          setClicks((current) => [`${next.lat.toFixed(3)}, ${next.lng.toFixed(3)}`, ...current].slice(0, 3));
         }
       }}
     >
-      {markers.map((marker, index) => (
-        <MapMarker key={`click-${index}`} position={marker} title={`Point ${index + 1}`} />
-      ))}
+      <MapControl position={topRight}>
+        <div className="wrapper-preview-stack">
+          {clicks.map((entry) => (
+            <div key={entry} className="wrapper-preview-tag">
+              {entry}
+            </div>
+          ))}
+        </div>
+      </MapControl>
     </GoogleMap>
   );
 }
@@ -241,71 +202,72 @@ function InfoWindowNoKeyPreview() {
     { id: 'montreal', name: 'Montreal', position: MONTREAL, text: 'Festival city.' }
   ];
   const [active, setActive] = useState<string | null>('toronto');
-  const markerRefs = useRef<Record<string, google.maps.Marker | null>>({});
 
   return (
-    <GoogleMap center={OTTAWA} zoom={6} height={420}>
-      {cities.map((city) => (
-        <MapMarker
-          key={city.id}
-          position={city.position}
-          title={city.name}
-          onLoad={(marker) => {
-            markerRefs.current[city.id] = marker;
-          }}
-          onUnmount={() => {
-            markerRefs.current[city.id] = null;
-          }}
-          onClick={() => setActive(city.id)}
-        />
-      ))}
-      <MapInfoWindow
-        anchor={active ? markerRefs.current[active] : null}
-        open={!!active}
-        position={cities.find((city) => city.id === active)?.position}
-        onCloseClick={() => setActive(null)}
-      >
-        {active ? (
-          <div>
-            <strong>{cities.find((city) => city.id === active)?.name}</strong>
-            <p>{cities.find((city) => city.id === active)?.text}</p>
-          </div>
-        ) : null}
-      </MapInfoWindow>
-    </GoogleMap>
+    <div className="wrapper-overlay-stage wrapper-overlay-stage--workbench">
+      <GoogleMap center={OTTAWA} zoom={6} mapId={NO_KEY_MAP_ID} height={420} />
+      <button type="button" className="wrapper-advanced-card wrapper-advanced-card--a wrapper-overlay-button" onClick={() => setActive('toronto')}>
+        <strong>Toronto</strong>
+        <span>Advanced marker card</span>
+      </button>
+      <button type="button" className="wrapper-advanced-card wrapper-advanced-card--b wrapper-overlay-button" onClick={() => setActive('montreal')}>
+        <strong>Montreal</strong>
+        <span>Click to inspect</span>
+      </button>
+      {active ? (
+        <div className="wrapper-preview-popup">
+          <strong>{cities.find((city) => city.id === active)?.name}</strong>
+          <span>{cities.find((city) => city.id === active)?.text}</span>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
 function DraggableNoKeyPreview() {
-  const [position, setPosition] = useState(TORONTO);
+  const [city, setCity] = useState<'toronto' | 'ottawa' | 'montreal'>('toronto');
+  const positions = {
+    toronto: { left: '15%', top: '62%' },
+    ottawa: { left: '42%', top: '39%' },
+    montreal: { left: '67%', top: '32%' }
+  } as const;
 
   return (
-    <GoogleMap center={position} zoom={10} height={420}>
-      <MapMarker
-        position={position}
-        draggable
-        title="Drag me"
-        icon="https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-        onDragEnd={(event) => {
-          const next = event.latLng?.toJSON();
-          if (next) {
-            setPosition(next);
-          }
-        }}
-      />
-    </GoogleMap>
+    <div className="wrapper-overlay-stage wrapper-overlay-stage--workbench">
+      <GoogleMap center={OTTAWA} zoom={6} mapId={NO_KEY_MAP_ID} height={420}>
+        <MapControl position={google.maps.ControlPosition.TOP_CENTER}>
+          <div className="wrapper-preview-toolbar">
+            <button type="button" onClick={() => setCity('toronto')}>Toronto</button>
+            <button type="button" onClick={() => setCity('ottawa')}>Ottawa</button>
+            <button type="button" onClick={() => setCity('montreal')}>Montreal</button>
+          </div>
+        </MapControl>
+      </GoogleMap>
+      <div className="wrapper-advanced-card wrapper-advanced-card--floating" style={positions[city]}>
+        <strong>{city[0].toUpperCase() + city.slice(1)}</strong>
+        <span>Drag preview state</span>
+      </div>
+    </div>
   );
 }
 
 function ClusterNoKeyPreview() {
   return (
-    <GoogleMap center={SAN_FRANCISCO} zoom={8} height={420}>
-      <MapMarkerClusterer>
-        {CLUSTER_POINTS.map((point, index) => (
-          <MapMarker key={`cluster-${index}`} position={point} title={`Cluster point ${index + 1}`} />
-        ))}
-      </MapMarkerClusterer>
-    </GoogleMap>
+    <div className="wrapper-overlay-stage wrapper-overlay-stage--workbench">
+      <GoogleMap center={SAN_FRANCISCO} zoom={8} mapId={NO_KEY_MAP_ID} height={420} />
+      <div className="wrapper-advanced-card wrapper-advanced-card--cluster-a">
+        <strong>Oakland</strong>
+        <span>Advanced marker</span>
+      </div>
+      <div className="wrapper-advanced-card wrapper-advanced-card--cluster-b">
+        <strong>San Jose</strong>
+        <span>Advanced marker</span>
+      </div>
+      <div className="wrapper-cluster-bubble">
+        <strong>24</strong>
+        <span>clustered</span>
+      </div>
+    </div>
   );
 }
 
@@ -339,9 +301,6 @@ function GeometryNoKeyPreview() {
         radius={12000}
         options={{ strokeColor: '#30a46c', fillColor: '#8ad7b0', fillOpacity: 0.14 }}
       />
-      <MapMarker position={TORONTO} title="Toronto" />
-      <MapMarker position={OTTAWA} title="Ottawa" />
-      <MapMarker position={MONTREAL} title="Montreal" />
     </GoogleMap>
   );
 }
@@ -374,9 +333,6 @@ function ControlNoKeyPreview() {
           </button>
         </div>
       </MapControl>
-      <MapMarker position={TORONTO} title="Toronto" />
-      <MapMarker position={OTTAWA} title="Ottawa" />
-      <MapMarker position={MONTREAL} title="Montreal" />
     </GoogleMap>
   );
 }
@@ -387,8 +343,19 @@ function FallbackBaseMapPreview({ label }: { label: string }) {
       <MapControl position={google.maps.ControlPosition.TOP_CENTER}>
         <div className="wrapper-preview-tag">{label}</div>
       </MapControl>
-      <MapMarker position={NEW_YORK} title="New York City" />
     </GoogleMap>
+  );
+}
+
+function BasicRoadmapNoKeyPreview() {
+  return (
+    <div className="wrapper-overlay-stage wrapper-overlay-stage--workbench">
+      <GoogleMap center={NEW_YORK} zoom={11} mapId={NO_KEY_MAP_ID} height={460} />
+      <div className="wrapper-advanced-card wrapper-advanced-card--basic">
+        <strong>New York City</strong>
+        <span>Advanced marker starter</span>
+      </div>
+    </div>
   );
 }
 

@@ -50,14 +50,16 @@ const DEFAULT_MAP_ID = 'DEMO_MAP_ID';
 
 const INSTALL_CODE = `npm install @revivejs/react-google-maps`;
 
-const PROVIDER_CODE = `import { GoogleMapsProvider, GoogleMap, MapMarker } from '@revivejs/react-google-maps';
+const PROVIDER_CODE = `import { GoogleMapsProvider } from '@revivejs/react-google-maps';
 
 function App() {
   return (
-    <GoogleMapsProvider>
-      <GoogleMap center={{ lat: 40.7128, lng: -74.006 }} zoom={11} height={420}>
-        <MapMarker position={{ lat: 40.7128, lng: -74.006 }} />
-      </GoogleMap>
+    <GoogleMapsProvider
+      apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
+      libraries={['marker']}
+      mapIds={[process.env.REACT_APP_GOOGLE_MAP_ID]}
+    >
+      <AppShell />
     </GoogleMapsProvider>
   );
 }`;
@@ -66,33 +68,51 @@ const PROVIDER_ONLY_CODE = `import { GoogleMapsProvider } from '@revivejs/react-
 
 function Root() {
   return (
-    <GoogleMapsProvider>
+    <GoogleMapsProvider
+      apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
+      libraries={['marker']}
+      mapIds={[process.env.REACT_APP_GOOGLE_MAP_ID]}
+    >
       <App />
     </GoogleMapsProvider>
   );
 }`;
 
-const MAP_RENDER_CODE = `import { GoogleMap, MapMarker } from '@revivejs/react-google-maps';
+const MAP_RENDER_CODE = `import { GoogleMap, MapAdvancedMarker } from '@revivejs/react-google-maps';
 
 const center = { lat: 40.7128, lng: -74.006 };
 
 function BasicMap() {
   return (
-    <GoogleMap center={center} zoom={11} height={460}>
-      <MapMarker position={center} title="New York City" />
+    <GoogleMap center={center} zoom={11} mapId={process.env.REACT_APP_GOOGLE_MAP_ID} height={360}>
+      <MapAdvancedMarker position={center} title="New York City">
+        <div className="marker-chip marker-chip--mini">
+          <strong>NYC</strong>
+          <span>Advanced marker</span>
+        </div>
+      </MapAdvancedMarker>
     </GoogleMap>
   );
 }`;
 
-const CLASSIC_EXAMPLE_CODE = `import { GoogleMapsProvider, GoogleMap, MapMarker } from '@revivejs/react-google-maps';
+const CLASSIC_EXAMPLE_CODE = `import { GoogleMapsProvider, GoogleMap, MapAdvancedMarker } from '@revivejs/react-google-maps';
 
 const center = { lat: 40.7128, lng: -74.006 };
 
-export function BasicMap() {
+export function AdvancedMarkerQuickStart() {
   return (
-    <GoogleMapsProvider>
-      <GoogleMap center={center} zoom={11} height={420}>
-        <MapMarker position={center} title="New York City" />
+    <GoogleMapsProvider
+      apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
+      libraries={['marker']}
+      mapIds={[process.env.REACT_APP_GOOGLE_MAP_ID]}
+    >
+      <GoogleMap center={center} zoom={11} mapId={process.env.REACT_APP_GOOGLE_MAP_ID} height={420}>
+        <MapAdvancedMarker position={center} title="New York City">
+          <div className="marker-chip marker-chip--mini">
+            <strong>NYC</strong>
+            <span>Advanced marker</span>
+          </div>
+        </MapAdvancedMarker>
       </GoogleMap>
     </GoogleMapsProvider>
   );
@@ -118,18 +138,18 @@ const INDEX_HTML_CODE = `<!-- index.html -->
 
 const MIGRATION_CODE = `// Angular-style mental model, React-friendly surface:
 // - <GoogleMap center={...} zoom={...} />
-// - <MapMarker position={...} />
+// - <MapAdvancedMarker position={...}>...</MapAdvancedMarker>
 // - <MapInfoWindow anchor={marker} open={open} />
 // - <MapMarkerClusterer>...</MapMarkerClusterer>
 // - MapDirectionsService + MapDirectionsRenderer
 // - useMapGeocoder() for geocoding flows`;
 
 const REF_CODE = `const mapRef = useRef<GoogleMapHandle>(null);
-const markerRef = useRef<MapMarkerHandle>(null);
+const markerRef = useRef<MapAdvancedMarkerHandle>(null);
 
 mapRef.current?.fitBounds(bounds);
-markerRef.current?.setVisible(false);
-markerRef.current?.getPosition()?.toJSON();`;
+markerRef.current?.setPosition(nextPoint);
+markerRef.current?.setZIndex(40);`;
 
 const CLUSTER_HELPER_CODE = `import { createClusterRenderer } from '@revivejs/react-google-maps';
 
@@ -172,7 +192,7 @@ function randomPoints(center: google.maps.LatLngLiteral, count: number) {
 const CLUSTER_POINTS = randomPoints(SAN_FRANCISCO, 36);
 const DOC_SECTIONS = [
   { id: 'overview', label: 'Overview' },
-  { id: 'quickstart', label: 'Classic Quick Start' },
+  { id: 'quickstart', label: 'Quick Start' },
   { id: 'setup', label: 'Setup' },
   { id: 'loading', label: 'Loading Patterns' },
   { id: 'migration', label: 'Migration Guide' },
@@ -537,7 +557,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
           <div className="feature-grid">
             <div className="feature">
               <strong>Angular-friendly migration</strong>
-              Familiar component names like <code>GoogleMap</code>, <code>MapMarker</code>,
+              Familiar component names like <code>GoogleMap</code>, <code>MapAdvancedMarker</code>,
               <code>MapInfoWindow</code>, and <code>MapMarkerClusterer</code>.
             </div>
             <div className="feature">
@@ -567,7 +587,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
         <article className="panel hero-setup" id="setup">
           <div className="panel-header">
             <h2>Setup in 3 steps</h2>
-            <p>Keep the setup practical: install the package, wrap the app once, then render the map. No commented pseudo-step in the middle.</p>
+            <p>Keep the setup practical: install the package, wrap the app once, then render one advanced marker map. The panel stays compact on purpose.</p>
           </div>
 
           <div className="step">
@@ -642,11 +662,11 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
         <div className="panels">
           <article className="panel quickstart-panel" id="quickstart">
             <div className="panel-header">
-              <h2>Classic Google Maps quick start</h2>
+              <h2>Advanced marker quick start</h2>
               <p>
-                This is the smallest working example in the whole docs. If you are looking for the
-                normal Google Maps "hello world" experience in React, start here before moving on
-                to advanced markers, clustering, directions, and custom overlays.
+                This is the smallest working example in the whole docs. It starts directly with
+                <code>AdvancedMarkerElement</code>, so the page never opens by teaching the legacy
+                marker model first.
               </p>
             </div>
 
@@ -655,20 +675,20 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               <div className="field-card field-card--code">
                 <span>Copy this first</span>
                 <p>
-                  One provider, one map, one marker. This is the closest equivalent to the classic
-                  Google Maps starter example, but in the wrapper API.
+                  One provider, one map, one advanced marker. Copy this first, then move into the
+                  workbench for clustering, geometry, directions, and service flows.
                 </p>
-                <CodeBlock title="Classic quick start" code={CLASSIC_EXAMPLE_CODE} />
+                <CodeBlock title="Advanced marker quick start" code={CLASSIC_EXAMPLE_CODE} />
               </div>
 
               <div className="field-card">
                 <span>About the top preview</span>
                 <p>
-                  The main hero already shows the wrapper preview in a dedicated full-width map row. This section stays focused on the exact code you should copy first.
+                  The main hero already shows the wrapper preview in a dedicated full-width map row. This section stays focused on the exact advanced-marker code you should copy first.
                 </p>
                 <div className="inline-note inline-note--ready">
                   <strong>Recommended flow</strong>
-                  <p>Copy the snippet, validate the big map at the top of the page, then move into the explorer once your base map is working.</p>
+                  <p>Copy the snippet, validate the big map at the top of the page, then move into the explorer once your advanced-marker base map is working.</p>
                 </div>
               </div>
               </div>
@@ -706,7 +726,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                 <span>No-key docs mode</span>
                 <p>
                   This documentation is intentionally built around a browser no-key preview because there is no shared Google key for the project.
-                  The hero and workbench still render a real map surface through isolated wrapper previews, while the code examples stay focused on the actual API you will use in your app.
+                  The hero and workbench still render a real map surface through isolated wrapper previews, while the code examples stay focused on the advanced-marker-first API you will use in your app.
                 </p>
                 <div className="inline-note inline-note--ready">
                   <strong>No credentials required to browse these docs.</strong>
@@ -754,7 +774,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             <div className="guide-grid guide-grid--three">
               <div className="field-card">
                 <span>Use MapMarker when</span>
-                <p>You are migrating older code, reusing classic marker icons, or you want the simplest possible drop-in replacement.</p>
+                <p>You are migrating older code or preserving a legacy marker workflow. The docs themselves stay advanced-marker first.</p>
               </div>
               <div className="field-card">
                 <span>Use MapAdvancedMarker when</span>

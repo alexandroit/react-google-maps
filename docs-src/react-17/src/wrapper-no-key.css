@@ -47,6 +47,16 @@ body {
   z-index: 2;
 }
 
+.wrapper-overlay-button {
+  appearance: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wrapper-overlay-button:hover {
+  transform: translateY(-1px);
+}
+
 .wrapper-advanced-card strong {
   font-size: 13px;
 }
@@ -75,6 +85,75 @@ body {
 .wrapper-advanced-card--c {
   left: 44%;
   top: 18%;
+}
+
+.wrapper-advanced-card--basic {
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+}
+
+.wrapper-advanced-card--floating {
+  transform: translate(-50%, -50%);
+}
+
+.wrapper-advanced-card--cluster-a {
+  left: 20%;
+  top: 56%;
+}
+
+.wrapper-advanced-card--cluster-b {
+  right: 18%;
+  top: 34%;
+}
+
+.wrapper-cluster-bubble {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  min-width: 92px;
+  min-height: 92px;
+  padding: 12px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, #d24b2a 0%, #1f5ba7 100%);
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(16, 32, 51, 0.18);
+  z-index: 3;
+}
+
+.wrapper-cluster-bubble strong {
+  font-size: 18px;
+}
+
+.wrapper-cluster-bubble span {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.wrapper-preview-popup {
+  position: absolute;
+  left: 48%;
+  top: 20%;
+  display: grid;
+  gap: 4px;
+  min-width: 180px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(16, 32, 51, 0.12);
+  background: rgba(255, 255, 255, 0.97);
+  color: #102033;
+  box-shadow: 0 14px 32px rgba(16, 32, 51, 0.18);
+  z-index: 4;
+}
+
+.wrapper-preview-popup span {
+  font-size: 12px;
+  color: #4b6078;
 }
 
 .wrapper-preview-toolbar {
@@ -110,6 +189,11 @@ body {
   box-shadow: 0 12px 28px rgba(16, 32, 51, 0.15);
 }
 
+.wrapper-preview-stack {
+  display: grid;
+  gap: 8px;
+}
+
 @media (max-width: 720px) {
   .wrapper-preview-toolbar {
     flex-direction: column;
@@ -140,5 +224,32 @@ body {
     left: 50%;
     top: 26px;
     transform: translateX(-50%);
+  }
+
+  .wrapper-advanced-card--basic {
+    top: 50%;
+  }
+
+  .wrapper-advanced-card--cluster-a {
+    left: 10px;
+    top: 210px;
+  }
+
+  .wrapper-advanced-card--cluster-b {
+    right: 10px;
+    top: 102px;
+  }
+
+  .wrapper-cluster-bubble {
+    top: 58%;
+    min-width: 82px;
+    min-height: 82px;
+  }
+
+  .wrapper-preview-popup {
+    left: 50%;
+    top: 22px;
+    transform: translateX(-50%);
+    min-width: 160px;
   }
 }
