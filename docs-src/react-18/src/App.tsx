@@ -28,7 +28,6 @@ import {
 type AppProps = {
   reactLine: string;
   reactVersion: string;
-  docsPath: string;
   packageVersion: string;
 };
 
@@ -182,23 +181,11 @@ function randomPoints(center: google.maps.LatLngLiteral, count: number) {
 }
 
 const CLUSTER_POINTS = randomPoints(SAN_FRANCISCO, 36);
-const DOC_SECTIONS = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'quickstart', label: 'Quick Start' },
-  { id: 'setup', label: 'Setup' },
-  { id: 'loading', label: 'Loading Patterns' },
-  { id: 'migration', label: 'Migration Guide' },
-  { id: 'marker-model', label: 'Marker Strategy' },
-  { id: 'customization', label: 'Customization' },
-  { id: 'examples', label: 'Example Workbench' },
-  { id: 'api-reference', label: 'API Reference' }
-] as const;
-
-export default function App({ reactLine, reactVersion, docsPath, packageVersion }: AppProps) {
+export default function App({ reactLine, reactVersion, packageVersion }: AppProps) {
   const [selectedId, setSelectedId] = useState('advanced-markers');
   const [logEntries, setLogEntries] = useState<string[]>(() => [
-    stamp(`No-key browser preview mode active.`),
-    stamp(`Loaded docs line ${reactLine}.`)
+    stamp(`Loaded ${reactLine} docs.`),
+    stamp(`Selected example: Advanced markers.`)
   ]);
 
   const pushLog = (message: string) => {
@@ -211,12 +198,14 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
         id: 'basic-roadmap',
         category: 'Test menu',
         title: 'Basic map bootstrapping',
-        description: 'The smallest useful setup: provider, map container, center, zoom, and a single marker.',
+        description: 'The smallest useful setup: provider, map container, center, zoom, and one advanced marker.',
         code: codeExample(
           'Basic roadmap',
           `<GoogleMapsProvider>
-  <GoogleMap center={TORONTO} zoom={11} height={420}>
-    <MapMarker position={TORONTO} />
+  <GoogleMap center={TORONTO} zoom={11} mapId={GOOGLE_MAP_ID} height={420}>
+    <MapAdvancedMarker position={TORONTO}>
+      <div className="marker-chip marker-chip--mini">Toronto</div>
+    </MapAdvancedMarker>
   </GoogleMap>
 </GoogleMapsProvider>`
         ),
@@ -238,7 +227,9 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
           `const [center, setCenter] = useState(TORONTO);
 const [zoom, setZoom] = useState(10);
 
-<GoogleMap center={center} zoom={zoom} />`
+<GoogleMap center={center} zoom={zoom} mapId={GOOGLE_MAP_ID}>
+  <MapAdvancedMarker position={center}>...</MapAdvancedMarker>
+</GoogleMap>`
         ),
         render: ({ pushLog }) => <ControlledCameraExample pushLog={pushLog} />
       },
@@ -252,7 +243,11 @@ const [zoom, setZoom] = useState(10);
           `<GoogleMap onClick={(event) => {
   const next = event.latLng?.toJSON();
   if (next) setMarkers((current) => [...current, next]);
-}} />`
+}}>
+  {markers.map((point) => (
+    <MapAdvancedMarker key={point.id} position={point}>...</MapAdvancedMarker>
+  ))}
+</GoogleMap>`
         ),
         render: ({ pushLog }) => <MapClickExample pushLog={pushLog} />
       },
@@ -263,7 +258,9 @@ const [zoom, setZoom] = useState(10);
         description: 'Use state-driven info windows with familiar marker click interactions.',
         code: codeExample(
           'Info window workflow',
-          `<MapMarker position={city.position} onClick={() => setActiveCity(city.id)} />
+          `<MapAdvancedMarker position={city.position} onClick={() => setActiveCity(city.id)}>
+  <div className="marker-chip">{city.name}</div>
+</MapAdvancedMarker>
 <MapInfoWindow anchor={activeMarker} open={activeCity === city.id}>
   <strong>{city.name}</strong>
 </MapInfoWindow>`
@@ -275,7 +272,6 @@ const [zoom, setZoom] = useState(10);
         category: 'Test menu',
         title: 'Advanced markers',
         description: 'Render rich marker content without dropping down to imperative DOM management.',
-        note: 'This docs line stays in browser no-key mode, so the workbench shows the stable fallback preview for advanced markers while keeping the TypeScript usage visible.',
         code: codeExample(
           'Advanced marker HTML',
           `<MapAdvancedMarker position={OTTAWA}>
@@ -308,14 +304,16 @@ const [zoom, setZoom] = useState(10);
         id: 'draggable-marker',
         category: 'Test menu',
         title: 'Draggable markers',
-        description: 'Track user drag interactions with a migration-friendly marker API.',
+        description: 'Track user drag interactions with a modern marker API.',
         code: codeExample(
           'Draggable marker',
-          `<MapMarker
+          `<MapAdvancedMarker
   position={marker}
-  draggable
+  gmpDraggable
   onDragEnd={(event) => setMarker(event.latLng!.toJSON())}
-/>`
+>
+  <div className="marker-chip marker-chip--mini">Drag me</div>
+</MapAdvancedMarker>`
         ),
         render: ({ pushLog }) => <DraggableMarkerExample pushLog={pushLog} />
       },
@@ -328,7 +326,7 @@ const [zoom, setZoom] = useState(10);
           'Marker clusterer',
           `<MapMarkerClusterer>
   {points.map((point) => (
-    <MapMarker key={point.id} position={point} />
+    <MapAdvancedMarker key={point.id} position={point}>...</MapAdvancedMarker>
   ))}
 </MapMarkerClusterer>`
         ),
@@ -349,7 +347,6 @@ const [zoom, setZoom] = useState(10);
         category: 'Advanced customization',
         title: 'Advanced markers + custom cluster HTML',
         description: 'Use advanced markers together with a custom cluster renderer so both individual pins and aggregated clusters can be fully branded.',
-        note: 'This example uses the same official markerclusterer package, but wraps the renderer with a React-friendly helper.',
         code: codeExample(
           'Custom cluster renderer',
           `const renderer = createClusterRenderer({
@@ -478,7 +475,6 @@ const [zoom, setZoom] = useState(10);
         category: 'Test menu',
         title: 'Directions',
         description: 'Keep route requests declarative with a renderless service component and a visual renderer.',
-        note: 'This docs line stays in browser no-key mode, so the workbench uses the stable fallback preview while the code sample documents the full directions integration.',
         code: codeExample(
           'Directions workflow',
           `<MapDirectionsService request={request} onResult={({ result }) => setDirections(result)} />
@@ -491,11 +487,12 @@ const [zoom, setZoom] = useState(10);
         category: 'Test menu',
         title: 'Geocoding',
         description: 'Use a React hook for address lookup and update the map with the geocoded result.',
-        note: 'This docs line stays in browser no-key mode, so the workbench uses the stable fallback preview while the code sample documents the full geocoding integration.',
         code: codeExample(
           'Geocoding hook',
           `const geocoder = useMapGeocoder();
-const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
+const response = await geocoder?.geocode({ address: 'Toronto City Hall' });
+
+<MapAdvancedMarker position={result.location}>...</MapAdvancedMarker>`
         ),
         render: ({ pushLog }) => <GeocoderExample pushLog={pushLog} />
       },
@@ -522,7 +519,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
 
   function openExample(example: ExampleDefinition) {
     setSelectedId(example.id);
-    pushLog(`Opened example: ${example.category} / ${example.title}.`);
+    pushLog(`Selected example: ${example.title}.`);
   }
 
   return (
@@ -532,7 +529,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
           <span className="badge">{reactLine} · GOOGLE MAPS · MARKERCLUSTERER</span>
           <h1>@revivejs/react-google-maps</h1>
           <p>
-            A migration-friendly React wrapper for the Google Maps JavaScript API with declarative
+            A React wrapper for the Google Maps JavaScript API with declarative
             maps, markers, advanced markers, info windows, shapes, services, layers, and official
             marker clustering support.
           </p>
@@ -548,9 +545,8 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
 
           <div className="feature-grid">
             <div className="feature">
-              <strong>Angular-friendly migration</strong>
-              Familiar component names like <code>GoogleMap</code>, <code>MapAdvancedMarker</code>,
-              <code>MapInfoWindow</code>, and <code>MapMarkerClusterer</code>.
+              <strong>Advanced markers first</strong>
+              Start with <code>MapAdvancedMarker</code>, HTML marker content, and a modern marker workflow from the first example.
             </div>
             <div className="feature">
               <strong>Official clustering</strong>
@@ -558,16 +554,16 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             </div>
             <div className="feature">
               <strong>Maps + services</strong>
-              Shapes, overlays, transport layers, directions, and geocoding all sit in one package.
+              Shapes, overlays, layers, directions, and geocoding all sit in one package.
             </div>
             <div className="feature">
-              <strong>Versioned docs history</strong>
+              <strong>Versioned React support</strong>
               Dedicated docs builds exist for React 17, 18, and 19 under the same maintained package line.
             </div>
           </div>
 
           <div className="cta-row">
-            <a className="btn" href="#examples">Open example workbench</a>
+            <a className="btn" href="#examples">Open live examples</a>
             <a className="btn secondary" href="https://github.com/alexandroit/react-google-maps#readme" target="_blank" rel="noreferrer">
               README
             </a>
@@ -579,7 +575,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
         <article className="panel hero-setup" id="setup">
           <div className="panel-header">
             <h2>Setup in 3 steps</h2>
-            <p>Keep the setup practical: install the package, wrap the app once, then render one advanced marker map. The panel stays compact on purpose.</p>
+            <p>Install the package, wrap the app once, then render the map.</p>
           </div>
 
           <div className="step">
@@ -612,7 +608,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
         <aside className="docs-sidebar">
           <div className="panel docs-nav-panel">
             <h2>Test menu</h2>
-            <p>Use this as a practical checklist. Click a test and the example workbench updates immediately with that Google Maps scenario.</p>
+            <p>Choose a scenario and the map on the right updates immediately.</p>
             <div className="docs-nav examples-nav">
               {groupedExamples.map((group) => (
                 <section key={group.category} className="demo-group">
@@ -636,53 +632,53 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               ))}
             </div>
           </div>
-
-          <div className="panel docs-nav-panel docs-nav-panel--secondary">
-            <h2>Guide sections</h2>
-            <p>Use the sections below for setup, migration, customization, and the full API reference.</p>
-            <nav className="docs-nav">
-              {DOC_SECTIONS.map((section) => (
-                <a key={section.id} className="docs-nav-link" href={`#${section.id}`}>
-                  {section.label}
-                </a>
-              ))}
-            </nav>
-          </div>
         </aside>
 
         <section className="layout">
-        <div className="panels">
-          <article className="panel quickstart-panel" id="quickstart">
+          <div className="panels">
+            <article className="panel example-workbench" id="examples">
+              <div className="panel-header">
+                <h2>Live examples</h2>
+                <p>Pick an item in the menu and the map updates here.</p>
+              </div>
+
+              <div className="selected-example-panel">
+                <div className="example-workbench__summary example-workbench__summary--single">
+                  <div className="demo-stage-header">
+                    <div className="demo-breadcrumb">
+                      <span className="meta-pill">{selected.category}</span>
+                      <span className="meta-pill light">{reactLine}</span>
+                    </div>
+                    <h3>{selected.title}</h3>
+                    <p>{selected.description}</p>
+                  </div>
+                </div>
+
+                <div className="example-workbench__map">
+                  <WrapperNoKeyPreview
+                    exampleId={selected.id}
+                    title={`${selected.title} browser preview`}
+                  />
+                </div>
+
+                <div className="demo-card demo-card--code">
+                  <CodeBlock title={`${selected.title} example`} code={selected.code} soft />
+                </div>
+              </div>
+            </article>
+
+            <article className="panel quickstart-panel" id="quickstart">
             <div className="panel-header">
               <h2>Advanced marker quick start</h2>
               <p>
-                This is the smallest working example in the whole docs. It starts directly with
-                <code>AdvancedMarkerElement</code>, so the page never opens by teaching the legacy
-                marker model first.
+                Start with one provider, one map, and one advanced marker.
               </p>
             </div>
 
             <div className="showcase-stack">
-              <div className="quickstart-grid">
               <div className="field-card field-card--code">
                 <span>Copy this first</span>
-                <p>
-                  One provider, one map, one advanced marker. Copy this first, then move into the
-                  workbench for clustering, geometry, directions, and service flows.
-                </p>
                 <CodeBlock title="Advanced marker quick start" code={CLASSIC_EXAMPLE_CODE} />
-              </div>
-
-              <div className="field-card">
-                <span>About the top preview</span>
-                <p>
-                  The main hero already shows the wrapper preview in a dedicated full-width map row. This section stays focused on the exact advanced-marker code you should copy first.
-                </p>
-                <div className="inline-note inline-note--ready">
-                  <strong>Recommended flow</strong>
-                  <p>Copy the snippet, validate the big map at the top of the page, then move into the explorer once your advanced-marker base map is working.</p>
-                </div>
-              </div>
               </div>
             </div>
           </article>
@@ -691,84 +687,21 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             <div className="panel-header">
               <h2>Loading patterns</h2>
               <p>
-                The package supports both common Google Maps loading strategies. For most React apps,
-                the recommended path is <code>GoogleMapsProvider</code>. If your organization already
-                standardizes on a global script in <code>index.html</code>, the wrapper also respects
-                an existing <code>window.google.maps</code>.
+                Use the provider for normal React apps, or reuse an existing script tag setup if your project already loads Google Maps globally.
               </p>
             </div>
 
             <div className="guide-grid guide-grid--two loading-patterns-grid">
               <label className="field-card">
                 <span>Provider-first setup</span>
-                <p>The provider is the easiest option when you want React to own lifecycle, retries, loading, and versioned docs parity.</p>
+                <p>The provider is the simplest way to load the API, control libraries, and keep the map lifecycle inside React.</p>
                 <CodeBlock title="Provider-first setup" code={PROVIDER_CODE} />
               </label>
 
               <div className="field-card">
                 <span>Script tag compatible</span>
-                <p>
-                  If your team already injects Google Maps globally, keep that pattern. The provider
-                  detects an existing <code>window.google.maps</code> and reuses it.
-                </p>
+                <p>If your project already injects Google Maps in <code>index.html</code>, the provider reuses <code>window.google.maps</code>.</p>
                 <CodeBlock title="index.html script loading" code={INDEX_HTML_CODE} />
-              </div>
-
-              <div className="field-card field-card--span">
-                <span>No-key docs mode</span>
-                <p>
-                  This documentation is intentionally built around a browser no-key preview because there is no shared Google key for the project.
-                  The hero and workbench still render a real map surface through isolated wrapper previews, while the code examples stay focused on the advanced-marker-first API you will use in your app.
-                </p>
-                <div className="inline-note inline-note--ready">
-                  <strong>No credentials required to browse these docs.</strong>
-                  <p>
-                    The same components and snippets shown here are the ones used in a full app. Examples that depend on extra Google services are still documented below, even though this docs line itself stays fully keyless.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article className="panel" id="migration">
-            <div className="panel-header">
-              <h2>Migration guide</h2>
-              <p>
-                The package is designed so a team coming from Angular Google Maps or direct Google Maps
-                JavaScript can migrate in layers instead of rewriting everything at once.
-              </p>
-            </div>
-
-            <div className="guide-grid guide-grid--two">
-              <div className="field-card field-card--span">
-                <span>Imperative escape hatch</span>
-                <p>When an app needs full control, use refs and native handles instead of breaking out of the wrapper entirely.</p>
-                <CodeBlock title="Imperative refs and handles" code={REF_CODE} />
-              </div>
-            </div>
-          </article>
-
-          <article className="panel" id="marker-model">
-            <div className="panel-header">
-              <h2>Marker strategy</h2>
-              <p>
-                The library intentionally keeps both marker models because large apps often need both:
-                the classic marker for compatibility and the advanced marker for branded HTML content.
-              </p>
-            </div>
-
-            <div className="guide-grid guide-grid--three">
-              <div className="field-card">
-                <span>Use MapMarker when</span>
-                <p>You are migrating older code or preserving a legacy marker workflow. The docs themselves stay advanced-marker first.</p>
-              </div>
-              <div className="field-card">
-                <span>Use MapAdvancedMarker when</span>
-                <p>You want HTML content, branded pin cards, richer interaction states, or tighter control over marker presentation.</p>
-              </div>
-              <div className="field-card">
-                <span>Use both together when</span>
-                <p>You are migrating gradually. The clusterer accepts both classic markers and advanced markers in the same wrapper.</p>
               </div>
             </div>
           </article>
@@ -777,75 +710,21 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             <div className="panel-header">
               <h2>Customization patterns</h2>
               <p>
-                This package is designed to stay simple for basic usage and still scale to highly customized maps.
-                The latest addition is custom cluster rendering with branded HTML.
+                Build branded markers, custom cluster visuals, and imperative controls on top of the same component model.
               </p>
             </div>
 
             <div className="guide-grid guide-grid--two">
               <div className="field-card">
                 <span>Custom cluster renderer</span>
-                <p>
-                  Use <code>createClusterRenderer()</code> when you want a higher-level helper, while still staying
-                  on the official clusterer API from Google.
-                </p>
+                <p>Use <code>createClusterRenderer()</code> to build branded cluster HTML while keeping the official Google clusterer API.</p>
                 <CodeBlock title="Custom cluster renderer" code={CLUSTER_HELPER_CODE} />
               </div>
 
               <div className="field-card">
-                <span>Why this helps</span>
-                <p>
-                  It keeps the official clusterer as the source of truth, but gives your React app an easy way
-                  to brand cluster visuals, switch between advanced-marker and fallback marker output, and keep the
-                  docs/examples readable.
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <article className="panel example-workbench" id="examples">
-            <div className="panel-header">
-              <h2>Example workbench</h2>
-              <p>
-                Pick any example from the left menu and it renders right here in a dedicated test surface. This is the main place to validate markers, polygons, clustering, directions, overlays, and controls.
-              </p>
-            </div>
-
-            <div className="selected-example-panel">
-              <div className="example-workbench__summary">
-                <div className="demo-stage-header">
-                  <div className="demo-breadcrumb">
-                    <span className="meta-pill">{selected.category}</span>
-                    <span className="meta-pill light">{reactLine}</span>
-                  </div>
-                  <h3>{selected.title}</h3>
-                  <p>{selected.description}</p>
-                  {selected.note ? <p className="demo-note">{selected.note}</p> : null}
-                </div>
-                <div className="example-workbench__summary-card">
-                  <strong>How to use this area</strong>
-                  <p>The menu on the left switches the test case. The map below is the single workbench for all supported Google Maps scenarios in this docs line.</p>
-                </div>
-              </div>
-
-              <div className="example-workbench__map">
-                <WrapperNoKeyPreview
-                  exampleId={selected.id}
-                  title={`${selected.title} browser preview`}
-                />
-              </div>
-
-              <div className="example-workbench__details">
-                <div className="example-workbench__note">
-                  <div className="inline-note inline-note--ready">
-                    <strong>No-key browser preview active.</strong>
-                    <p>The workbench keeps rendering the selected scenario in an isolated browser preview, so the docs remain practical even without a shared Google Maps key.</p>
-                  </div>
-                </div>
-
-                <div className="demo-card demo-card--code">
-                  <CodeBlock title={`${selected.title} example`} code={selected.code} soft />
-                </div>
+                <span>Imperative refs and handles</span>
+                <p>Use refs when you need direct access to the underlying map and marker instances.</p>
+                <CodeBlock title="Imperative refs and handles" code={REF_CODE} />
               </div>
             </div>
           </article>
@@ -853,76 +732,49 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
           <article className="panel" id="api-reference">
             <div className="panel-header">
               <h2>API reference</h2>
-              <p>The package keeps the surface declarative, but still exposes native instances through refs and callbacks for advanced integrations.</p>
+              <p>Core components, layers, services, and hooks in one place.</p>
             </div>
 
             <div className="ref-grid">
               <div className="ref-card">
                 <h4>Core components</h4>
-                <table className="api-table">
-                  <tbody>
-                    <tr>
-                      <td><code>&lt;GoogleMapsProvider /&gt;</code></td>
-                      <td>Loads the Google Maps JavaScript API once and shares readiness through context.</td>
-                    </tr>
-                    <tr>
-                      <td><code>&lt;GoogleMap /&gt;</code></td>
-                      <td>Creates the map instance with familiar props like <code>center</code>, <code>zoom</code>, <code>mapId</code>, and <code>options</code>.</td>
-                    </tr>
-                    <tr>
-                      <td><code>&lt;MapMarker /&gt;</code></td>
-                      <td>Wraps <code>google.maps.Marker</code> with common props and events.</td>
-                    </tr>
-                    <tr>
-                      <td><code>&lt;MapAdvancedMarker /&gt;</code></td>
-                      <td>Wraps <code>AdvancedMarkerElement</code> and lets React render rich HTML marker content.</td>
-                    </tr>
-                    <tr>
-                      <td><code>&lt;MapInfoWindow /&gt;</code></td>
-                      <td>Anchors React content to markers or positions via <code>google.maps.InfoWindow</code>.</td>
-                    </tr>
-                    <tr>
-                      <td><code>&lt;MapMarkerClusterer /&gt;</code></td>
-                      <td>Groups markers using the official Google markerclusterer library.</td>
-                    </tr>
-                    <tr>
-                      <td><code>createClusterRenderer()</code></td>
-                      <td>Builds custom cluster HTML or fallback icon renderers without replacing the official clusterer API.</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div className="api-list">
+                  <div className="api-item"><code>&lt;GoogleMapsProvider /&gt;</code><p>Loads the Google Maps JavaScript API and exposes readiness through context.</p></div>
+                  <div className="api-item"><code>&lt;GoogleMap /&gt;</code><p>Creates the map with props like <code>center</code>, <code>zoom</code>, <code>mapId</code>, and <code>options</code>.</p></div>
+                  <div className="api-item"><code>&lt;MapAdvancedMarker /&gt;</code><p>Renders <code>AdvancedMarkerElement</code> with React HTML content.</p></div>
+                  <div className="api-item"><code>&lt;MapMarker /&gt;</code><p>Wraps the classic marker for legacy integrations.</p></div>
+                  <div className="api-item"><code>&lt;MapInfoWindow /&gt;</code><p>Anchors React content to a marker or position.</p></div>
+                  <div className="api-item"><code>&lt;MapMarkerClusterer /&gt;</code><p>Clusters markers with the official Google package.</p></div>
+                  <div className="api-item"><code>createClusterRenderer()</code><p>Builds custom cluster HTML without replacing the official clusterer API.</p></div>
+                </div>
               </div>
 
               <div className="ref-card">
                 <h4>Overlays and layers</h4>
-                <table className="api-table">
-                  <tbody>
-                    <tr><td><code>&lt;MapPolyline /&gt;</code></td><td>Polyline paths</td></tr>
-                    <tr><td><code>&lt;MapPolygon /&gt;</code></td><td>Polygon areas</td></tr>
-                    <tr><td><code>&lt;MapRectangle /&gt;</code></td><td>Bounds rectangles</td></tr>
-                    <tr><td><code>&lt;MapCircle /&gt;</code></td><td>Radius overlays</td></tr>
-                    <tr><td><code>&lt;MapGroundOverlay /&gt;</code></td><td>Image overlays</td></tr>
-                    <tr><td><code>&lt;MapTrafficLayer /&gt;</code></td><td>Traffic data</td></tr>
-                    <tr><td><code>&lt;MapTransitLayer /&gt;</code></td><td>Transit data</td></tr>
-                    <tr><td><code>&lt;MapBicyclingLayer /&gt;</code></td><td>Bicycling data</td></tr>
-                    <tr><td><code>&lt;MapKmlLayer /&gt;</code></td><td>KML feeds</td></tr>
-                    <tr><td><code>&lt;MapHeatmapLayer /&gt;</code></td><td>Visualization heatmaps</td></tr>
-                  </tbody>
-                </table>
+                <div className="api-list">
+                  <div className="api-item"><code>&lt;MapPolyline /&gt;</code><p>Polyline paths.</p></div>
+                  <div className="api-item"><code>&lt;MapPolygon /&gt;</code><p>Polygon areas.</p></div>
+                  <div className="api-item"><code>&lt;MapRectangle /&gt;</code><p>Bounds rectangles.</p></div>
+                  <div className="api-item"><code>&lt;MapCircle /&gt;</code><p>Radius overlays.</p></div>
+                  <div className="api-item"><code>&lt;MapGroundOverlay /&gt;</code><p>Image overlays.</p></div>
+                  <div className="api-item"><code>&lt;MapTrafficLayer /&gt;</code><p>Traffic layer.</p></div>
+                  <div className="api-item"><code>&lt;MapTransitLayer /&gt;</code><p>Transit layer.</p></div>
+                  <div className="api-item"><code>&lt;MapBicyclingLayer /&gt;</code><p>Bicycling layer.</p></div>
+                  <div className="api-item"><code>&lt;MapKmlLayer /&gt;</code><p>KML feeds.</p></div>
+                  <div className="api-item"><code>&lt;MapHeatmapLayer /&gt;</code><p>Heatmaps.</p></div>
+                </div>
               </div>
 
               <div className="ref-card">
                 <h4>Services and hooks</h4>
-                <table className="api-table">
-                  <tbody>
-                    <tr><td><code>&lt;MapDirectionsService /&gt;</code></td><td>Renderless directions request runner.</td></tr>
-                    <tr><td><code>&lt;MapDirectionsRenderer /&gt;</code></td><td>Visual directions overlay.</td></tr>
-                    <tr><td><code>useGoogleMap()</code></td><td>Returns the current native <code>google.maps.Map</code> inside descendants.</td></tr>
-                    <tr><td><code>useMapGeocoder()</code></td><td>Returns a memoized <code>google.maps.Geocoder</code> instance.</td></tr>
-                    <tr><td><code>useDirectionsService()</code></td><td>Returns a memoized <code>google.maps.DirectionsService</code> instance.</td></tr>
-                    <tr><td><code>&lt;MapControl /&gt;</code></td><td>Mounts React UI into native map control slots.</td></tr>
-                  </tbody>
-                </table>
+                <div className="api-list">
+                  <div className="api-item"><code>&lt;MapDirectionsService /&gt;</code><p>Renderless directions requests.</p></div>
+                  <div className="api-item"><code>&lt;MapDirectionsRenderer /&gt;</code><p>Visual route overlay.</p></div>
+                  <div className="api-item"><code>useGoogleMap()</code><p>Returns the current native <code>google.maps.Map</code>.</p></div>
+                  <div className="api-item"><code>useMapGeocoder()</code><p>Returns a memoized <code>google.maps.Geocoder</code>.</p></div>
+                  <div className="api-item"><code>useDirectionsService()</code><p>Returns a memoized <code>google.maps.DirectionsService</code>.</p></div>
+                  <div className="api-item"><code>&lt;MapControl /&gt;</code><p>Mounts React UI into native map control slots.</p></div>
+                </div>
               </div>
             </div>
           </article>
@@ -933,7 +785,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             <div className="log-header">
               <div>
                 <h2>Event Log</h2>
-                <p>Map clicks, service responses, control interactions, and explorer changes appear here.</p>
+                <p>Selection changes and interaction events appear here.</p>
               </div>
               <button className="clear-btn" type="button" onClick={() => setLogEntries([])}>
                 Clear
@@ -950,12 +802,11 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
 
             <div className="release-card">
               <h3>Release line</h3>
-              <p>This docs build matches the maintained React compatibility line and the published npm package.</p>
+              <p>Published package and compatibility line.</p>
               <div className="api-row"><strong>Package line</strong><span>{packageVersion}</span></div>
               <div className="api-row"><strong>React line</strong><span>{reactVersion}</span></div>
-              <div className="api-row"><strong>Docs path</strong><span>{docsPath}/</span></div>
-              <div className="api-row"><strong>Pattern</strong><span>docs-src history + compiled docs history</span></div>
-              <div className="api-row"><strong>Includes</strong><span>markerclusterer, layers, directions, geocoder</span></div>
+              <div className="api-row"><strong>Clustering</strong><span>@googlemaps/markerclusterer</span></div>
+              <div className="api-row"><strong>Includes</strong><span>advanced markers, layers, directions, geocoding</span></div>
             </div>
           </section>
         </aside>
