@@ -30,10 +30,13 @@ body {
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr);
   gap: 24px;
-  align-items: stretch;
   margin-bottom: 28px;
+}
+
+.hero-main {
+  display: grid;
+  gap: 18px;
 }
 
 .hero-card,
@@ -148,8 +151,11 @@ pre.code {
 
 .hero-setup {
   display: grid;
-  grid-template-rows: auto auto 1fr;
   gap: 16px;
+}
+
+.setup-section {
+  margin-bottom: 28px;
 }
 
 .step {
@@ -288,6 +294,10 @@ pre.code {
   border-radius: 18px;
   border: 1px solid rgba(16, 32, 51, 0.08);
   background: linear-gradient(180deg, #fff 0%, #f7fafc 100%);
+}
+
+.hero-map-showcase {
+  margin-top: 4px;
 }
 
 .map-showcase__header {
@@ -939,10 +949,6 @@ pre.code {
 }
 
 @media (max-width: 1040px) {
-  .hero {
-    grid-template-columns: 1fr;
-  }
-
   .example-explorer {
     grid-template-columns: 1fr;
   }
@@ -977,6 +983,10 @@ pre.code {
   .hero-card,
   .panel {
     padding: 18px;
+  }
+
+  .map-showcase {
+    padding: 14px;
   }
 
   .feature-grid {

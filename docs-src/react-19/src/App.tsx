@@ -68,6 +68,28 @@ function App() {
   );
 }`;
 
+const PROVIDER_ONLY_CODE = `import { GoogleMapsProvider } from '@revivejs/react-google-maps';
+
+function Root() {
+  return (
+    <GoogleMapsProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} mapIds={['DEMO_MAP_ID']}>
+      <App />
+    </GoogleMapsProvider>
+  );
+}`;
+
+const MAP_RENDER_CODE = `import { GoogleMap, MapMarker } from '@revivejs/react-google-maps';
+
+const center = { lat: 40.7128, lng: -74.006 };
+
+function BasicMap() {
+  return (
+    <GoogleMap center={center} zoom={11} height={460}>
+      <MapMarker position={center} title="New York City" />
+    </GoogleMap>
+  );
+}`;
+
 const CLASSIC_EXAMPLE_CODE = `import { GoogleMapsProvider, GoogleMap, MapMarker } from '@revivejs/react-google-maps';
 
 const center = { lat: 40.7128, lng: -74.006 };
@@ -612,6 +634,28 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             marker clustering support.
           </p>
 
+          <div className="map-showcase hero-map-showcase">
+            <div className="map-showcase__header">
+              <div>
+                <span className="meta-pill light">{isDevPreview ? 'first look preview' : 'live first look'}</span>
+                <h3>{isDevPreview ? 'Google Maps first look' : 'Live Google Maps first look'}</h3>
+                <p>
+                  {isDevPreview
+                    ? 'The very first thing on the page is the map preview. In mock mode it runs the wrapper in isolation so you can inspect behavior without destabilizing the docs shell.'
+                    : 'This is the primary map showcase for the page. It stays large, visible, and isolated so developers can validate the wrapper immediately.'}
+                </p>
+              </div>
+            </div>
+            <div className="quickstart-demo">
+              <ClassicQuickStartPreview
+                apiKey={runtimeApiKey}
+                mapId={mapId}
+                isDevPreview={isDevPreview}
+                pushLog={pushLog}
+              />
+            </div>
+          </div>
+
           <div className="feature-grid">
             <div className="feature">
               <strong>Angular-friendly migration</strong>
@@ -639,9 +683,14 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             </a>
           </div>
         </div>
+      </section>
 
-        <div className="hero-card hero-setup" id="setup">
-          <h2>Setup in 3 steps</h2>
+      <section className="setup-section">
+        <article className="panel hero-setup" id="setup">
+          <div className="panel-header">
+            <h2>Setup in 3 steps</h2>
+            <p>Keep the setup practical: install the package, wrap the app once, then render the map. No commented pseudo-step in the middle.</p>
+          </div>
 
           <div className="step">
             <span className="step-num">1</span>
@@ -654,19 +703,19 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
           <div className="step">
             <span className="step-num">2</span>
             <div>
-              <strong>Wrap your app with the provider</strong>
-              <CodeBlock title="Provider setup" code={PROVIDER_CODE} compact />
+              <strong>Wrap the app once</strong>
+              <CodeBlock title="Provider setup" code={PROVIDER_ONLY_CODE} compact />
             </div>
           </div>
 
           <div className="step">
             <span className="step-num">3</span>
             <div>
-              <strong>Keep migration simple</strong>
-              <CodeBlock title="Migration mental model" code={MIGRATION_CODE} compact />
+              <strong>Render the map</strong>
+              <CodeBlock title="Basic map render" code={MAP_RENDER_CODE} compact />
             </div>
           </div>
-        </div>
+        </article>
       </section>
 
       <section className="docs-layout">
@@ -708,39 +757,17 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               </div>
 
               <div className="field-card">
-                <span>{isDevPreview ? 'Preview mode' : 'Live mode'}</span>
+                <span>{isDevPreview ? 'About the top preview' : 'About the top preview'}</span>
                 <p>
                   {isDevPreview
-                    ? 'The main docs stay stable while the isolated wrapper preview below shows the real no-key behavior of the library.'
-                    : 'Live maps are enabled, so the preview row below is running the wrapper version of the classic Google Maps hello-world example.'}
+                    ? 'The main hero already shows the wrapper preview in a dedicated full-width map row. This section stays focused on the code you should copy first.'
+                    : 'The main hero already shows the live map in a dedicated full-width row. This section stays focused on the exact code you should copy.'}
                 </p>
                 <div className="inline-note inline-note--ready">
                   <strong>Recommended flow</strong>
-                  <p>Copy the snippet, confirm the preview row below, then move into the explorer once your base map is working.</p>
+                  <p>Copy the snippet, validate the big map at the top of the page, then move into the explorer once your base map is working.</p>
                 </div>
               </div>
-              </div>
-
-              <div className="map-showcase">
-                <div className="map-showcase__header">
-                  <div>
-                    <span className="meta-pill light">{isDevPreview ? 'wrapper preview' : 'live map preview'}</span>
-                    <h3>{isDevPreview ? 'Wrapper no-key preview' : 'Classic quick start map'}</h3>
-                    <p>
-                      {isDevPreview
-                        ? 'This row runs the wrapper itself in an isolated page with no key, so you can validate the library behavior without destabilizing the rest of the docs.'
-                        : 'The map sits on its own exclusive row so the preview stays large and easy to validate while you test the simplest setup.'}
-                    </p>
-                  </div>
-                </div>
-                <div className="quickstart-demo">
-                  <ClassicQuickStartPreview
-                    apiKey={runtimeApiKey}
-                    mapId={mapId}
-                    isDevPreview={isDevPreview}
-                    pushLog={pushLog}
-                  />
-                </div>
               </div>
             </div>
           </article>
