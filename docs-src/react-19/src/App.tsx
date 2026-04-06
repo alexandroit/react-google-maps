@@ -180,6 +180,7 @@ const CLUSTER_POINTS = randomPoints(SAN_FRANCISCO, 36);
 const DOC_SECTIONS = [
   { id: 'overview', label: 'Overview' },
   { id: 'quickstart', label: 'Classic Quick Start' },
+  { id: 'featured-examples', label: 'Featured Examples' },
   { id: 'setup', label: 'Setup' },
   { id: 'loading', label: 'Loading Patterns' },
   { id: 'migration', label: 'Migration Guide' },
@@ -188,6 +189,8 @@ const DOC_SECTIONS = [
   { id: 'examples', label: 'Example Explorer' },
   { id: 'api-reference', label: 'API Reference' }
 ] as const;
+
+const FEATURED_EXAMPLE_IDS = ['basic-roadmap', 'marker-clusterer', 'custom-cluster-html', 'directions'] as const;
 
 export default function App({ reactLine, reactVersion, docsPath, packageVersion }: AppProps) {
   const [apiKey, setApiKey] = useState(() =>
@@ -621,6 +624,15 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
   );
 
   const selected = examples.find((example) => example.id === selectedId) || examples[0];
+  const groupedExamples = groupExamples(examples);
+  const featuredExamples = FEATURED_EXAMPLE_IDS.map((id) => examples.find((example) => example.id === id)).filter(
+    Boolean
+  ) as ExampleDefinition[];
+
+  function openExample(example: ExampleDefinition) {
+    setSelectedId(example.id);
+    pushLog(`Opened example: ${example.category} / ${example.title}.`);
+  }
 
   return (
     <main className="shell">
@@ -677,7 +689,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
           </div>
 
           <div className="cta-row">
-            <a className="btn" href="#examples">See examples</a>
+            <a className="btn" href="#featured-examples">See examples</a>
             <a className="btn secondary" href="https://github.com/alexandroit/react-google-maps#readme" target="_blank" rel="noreferrer">
               README
             </a>
@@ -768,6 +780,93 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                   <p>Copy the snippet, validate the big map at the top of the page, then move into the explorer once your base map is working.</p>
                 </div>
               </div>
+              </div>
+            </div>
+          </article>
+
+          <article className="panel" id="featured-examples">
+            <div className="panel-header">
+              <h2>Featured examples</h2>
+              <p>
+                The docs currently ship {examples.length} live examples across {groupedExamples.length} categories. These are the ones most teams look for first when evaluating the wrapper.
+              </p>
+            </div>
+
+            <div className="featured-grid">
+              {featuredExamples.map((example) => (
+                <div key={example.id} className="field-card featured-card">
+                  <div className="demo-breadcrumb">
+                    <span className="meta-pill">{example.category}</span>
+                  </div>
+                  <h3>{example.title}</h3>
+                  <p>{example.description}</p>
+                  {example.note ? <p className="demo-note">{example.note}</p> : null}
+                  <CodeBlock title={`${example.title} snippet`} code={previewCode(example.code)} soft compact />
+                  <button
+                    type="button"
+                    className="btn secondary featured-card__action"
+                    onClick={() => openExample(example)}
+                  >
+                    Open in explorer
+                  </button>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <article className="panel" id="clustering">
+            <div className="panel-header">
+              <h2>Marker clusterer quick start</h2>
+              <p>
+                A visible, dedicated example of the official Google markerclusterer integration. This stays on the page even before you interact with the explorer.
+              </p>
+            </div>
+
+            <div className="showcase-stack">
+              <div className="quickstart-grid">
+                <div className="field-card field-card--code">
+                  <span>Cluster many markers</span>
+                  <p>
+                    This is the smallest useful cluster example: one map, one clusterer, many markers. It uses the official Google clusterer package, not a custom abstraction.
+                  </p>
+                  <CodeBlock title="Marker clustering" code={examples.find((example) => example.id === 'marker-clusterer')?.code || ''} />
+                </div>
+
+                <div className="field-card">
+                  <span>Why it matters</span>
+                  <p>
+                    Clustering is one of the first things teams ask about in production maps. This wrapper keeps the official clusterer visible and simple instead of hiding it in a helper-only API.
+                  </p>
+                  <div className="inline-note inline-note--ready">
+                    <strong>What this proves</strong>
+                    <p>The page includes a real `MapMarkerClusterer` example, plus a second example with custom cluster HTML in the explorer below.</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn secondary featured-card__action"
+                    onClick={() => {
+                      const clusterExample = examples.find((example) => example.id === 'marker-clusterer');
+                      if (clusterExample) {
+                        openExample(clusterExample);
+                      }
+                    }}
+                  >
+                    Open full cluster example
+                  </button>
+                </div>
+              </div>
+
+              <div className="map-showcase">
+                <div className="map-showcase__header">
+                  <div>
+                    <span className="meta-pill light">official markerclusterer</span>
+                    <h3>Marker clustering preview</h3>
+                    <p>The map stays on its own row so the cluster behavior is visible and testable without squeezing the code block.</p>
+                  </div>
+                </div>
+                <div className="demo-card demo-card--map">
+                  {examples.find((example) => example.id === 'marker-clusterer')?.render({ apiKey: runtimeApiKey, mapId, pushLog })}
+                </div>
               </div>
             </div>
           </article>
@@ -940,19 +1039,19 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
 
             <div className="example-explorer">
               <aside className="demo-nav">
-                {groupExamples(examples).map((group) => (
+                {groupedExamples.map((group) => (
                   <section key={group.category} className="demo-group">
-                    <h3>{group.category}</h3>
+                    <h3>
+                      {group.category}
+                      <span className="demo-group-count">{group.items.length}</span>
+                    </h3>
                     <div className="demo-list">
                       {group.items.map((example) => (
                         <button
                           key={example.id}
                           type="button"
                           className={`demo-link ${selected.id === example.id ? 'active' : ''}`}
-                          onClick={() => {
-                            setSelectedId(example.id);
-                            pushLog(`Opened example: ${example.category} / ${example.title}.`);
-                          }}
+                          onClick={() => openExample(example)}
                         >
                           {example.title}
                         </button>
@@ -1123,6 +1222,10 @@ function groupExamples(examples: ExampleDefinition[]) {
     category,
     items: examples.filter((example) => example.category === category)
   }));
+}
+
+function previewCode(code: string, maxLines = 10) {
+  return code.split('\n').slice(0, maxLines).join('\n');
 }
 
 function CodeBlock({
