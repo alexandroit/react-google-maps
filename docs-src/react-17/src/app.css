@@ -229,6 +229,9 @@ pre.code {
 
 .docs-sidebar {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .docs-nav-panel {
@@ -236,6 +239,10 @@ pre.code {
   top: 20px;
   display: grid;
   gap: 14px;
+}
+
+.docs-nav-panel--secondary {
+  position: static;
 }
 
 .docs-nav {
@@ -345,12 +352,6 @@ pre.code {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.featured-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
 .field-card {
   display: flex;
   flex-direction: column;
@@ -367,15 +368,6 @@ pre.code {
 
 .field-card--span {
   grid-column: 1 / -1;
-}
-
-.featured-card {
-  min-width: 0;
-}
-
-.featured-card__action {
-  align-self: flex-start;
-  margin-top: auto;
 }
 
 .field-card span {
@@ -398,16 +390,8 @@ pre.code {
   min-width: 0;
 }
 
-.example-explorer {
+.examples-nav {
   display: grid;
-  grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
-  gap: 16px;
-}
-
-.demo-nav {
-  align-self: start;
-  display: flex;
-  flex-direction: column;
   gap: 14px;
 }
 
@@ -520,6 +504,11 @@ pre.code {
 .demo-stage-header {
   display: grid;
   gap: 8px;
+}
+
+.selected-example-panel {
+  display: grid;
+  gap: 16px;
 }
 
 .api-key-empty,
@@ -976,7 +965,6 @@ pre.code {
 
   .ref-grid,
   .credentials-grid,
-  .featured-grid,
   .quickstart-grid,
   .guide-grid,
   .guide-grid--two,
@@ -986,14 +974,6 @@ pre.code {
 }
 
 @media (max-width: 1040px) {
-  .example-explorer {
-    grid-template-columns: 1fr;
-  }
-
-  .demo-nav {
-    order: 2;
-  }
-
   .dev-preview__header {
     grid-template-columns: 1fr;
     display: grid;
