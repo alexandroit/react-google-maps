@@ -1,0 +1,14 @@
+node_modules/
+.DS_Store
+*.log
+.vite/
+coverage/
+docs-src/react-17/node_modules/
+docs-src/react-17/package-lock.json
+docs-src/react-18/node_modules/
+docs-src/react-18/package-lock.json
+docs-src/react-19/node_modules/
+docs-src/react-19/package-lock.json
+docs-src/react-17/dist/
+docs-src/react-18/dist/
+docs-src/react-19/dist/
