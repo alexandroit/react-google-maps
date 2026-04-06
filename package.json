@@ -1,7 +1,7 @@
 {
   "name": "@revivejs/react-google-maps",
-  "version": "18.0.1",
-  "description": "A maintained React 18 wrapper for the Google Maps JavaScript API with versioned docs, marker clustering, and migration-friendly components.",
+  "version": "19.0.1",
+  "description": "A maintained React 19 wrapper for the Google Maps JavaScript API with versioned docs, marker clustering, and migration-friendly components.",
   "keywords": [
     "react",
     "react-library",
@@ -60,8 +60,8 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "react": ">=18.0.0 <19.0.0",
-    "react-dom": ">=18.0.0 <19.0.0"
+    "react": ">=19.0.0 <20.0.0",
+    "react-dom": ">=19.0.0 <20.0.0"
   },
   "dependencies": {
     "@googlemaps/markerclusterer": "2.6.2"
