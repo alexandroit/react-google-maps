@@ -51,7 +51,7 @@ type ExampleContext = {
 const API_KEY_STORAGE_KEY = '@revivejs/react-google-maps/demo-api-key';
 const MAP_ID_STORAGE_KEY = '@revivejs/react-google-maps/demo-map-id';
 const DEFAULT_MAP_ID = 'DEMO_MAP_ID';
-const DEFAULT_DEMO_API_KEY = 'AIzaSyAvcDy5ZYc2ujCS6TTtI3RYX5QmuoV8Ffw';
+const DEFAULT_DEMO_API_KEY = 'NoValidNoValidNoValidNoValidNoValidNoVa';
 
 const INSTALL_CODE = `npm install @revivejs/react-google-maps`;
 
