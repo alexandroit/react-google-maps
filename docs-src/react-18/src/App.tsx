@@ -51,6 +51,7 @@ type ExampleContext = {
 const API_KEY_STORAGE_KEY = '@revivejs/react-google-maps/demo-api-key';
 const MAP_ID_STORAGE_KEY = '@revivejs/react-google-maps/demo-map-id';
 const DEFAULT_MAP_ID = 'DEMO_MAP_ID';
+const DEFAULT_DEMO_API_KEY = 'AIzaSyAvcDy5ZYc2ujCS6TTtI3RYX5QmuoV8Ffw';
 
 const INSTALL_CODE = `npm install @revivejs/react-google-maps`;
 
@@ -162,7 +163,7 @@ const DOC_SECTIONS = [
 
 export default function App({ reactLine, reactVersion, docsPath, packageVersion }: AppProps) {
   const [apiKey, setApiKey] = useState(() =>
-    typeof window !== 'undefined' ? window.localStorage.getItem(API_KEY_STORAGE_KEY) || '' : ''
+    typeof window !== 'undefined' ? window.localStorage.getItem(API_KEY_STORAGE_KEY) || DEFAULT_DEMO_API_KEY : DEFAULT_DEMO_API_KEY
   );
   const [mapId, setMapId] = useState(() =>
     typeof window !== 'undefined' ? window.localStorage.getItem(MAP_ID_STORAGE_KEY) || DEFAULT_MAP_ID : DEFAULT_MAP_ID
