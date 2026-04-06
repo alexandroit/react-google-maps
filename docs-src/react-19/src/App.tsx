@@ -137,6 +137,11 @@ function stamp(message: string) {
   return `${new Date().toLocaleTimeString('en-US', { hour12: false })} ${message}`;
 }
 
+function isLiveApiKey(value: string) {
+  const normalized = value.trim();
+  return normalized.length > 0 && normalized !== DEFAULT_DEMO_API_KEY;
+}
+
 function codeExample(title: string, content: string) {
   return `// ${title}\n${content}`;
 }
@@ -171,7 +176,8 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
   const [selectedId, setSelectedId] = useState('basic-roadmap');
   const [logEntries, setLogEntries] = useState<string[]>(() => [stamp(`Loaded docs line ${reactLine}.`)]);
   const normalizedApiKey = apiKey.trim();
-  const isDevPreview = normalizedApiKey.length === 0;
+  const hasLiveApiKey = isLiveApiKey(normalizedApiKey);
+  const isDevPreview = !hasLiveApiKey;
 
   const pushLog = (message: string) => {
     setLogEntries((current) => [stamp(message), ...current].slice(0, 18));
@@ -744,8 +750,9 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                 <p>
                   Paste a browser API key to unlock the live explorer. Without a key, the docs stay in
                   a developer preview mode so you can still browse setup, examples, and TypeScript patterns.
-                  Advanced markers need a map ID. <code>DEMO_MAP_ID</code> works for demos. Directions and
-                  geocoding also need the corresponding Google APIs enabled for the same key.
+                  The default value here is intentionally invalid, so you must replace it with a real browser
+                  key before the live map initializes. Advanced markers need a map ID. <code>DEMO_MAP_ID</code>
+                  works for demos. Directions and geocoding also need the corresponding Google APIs enabled for the same key.
                 </p>
                 <input
                   className="text-input"
@@ -1048,7 +1055,7 @@ function DemoSurface({
 }) {
   const normalizedApiKey = apiKey.trim();
 
-  if (!normalizedApiKey) {
+  if (!isLiveApiKey(normalizedApiKey)) {
     return <DevModePreview mapId={mapId} />;
   }
 
