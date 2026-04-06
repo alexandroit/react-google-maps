@@ -103,7 +103,7 @@ function getPreviewDefinition(id: string): PreviewDefinition {
     case 'map-events':
       return {
         title: 'Click events',
-        note: 'Drop markers on click to validate map events with the wrapper even before a real key is configured.',
+        note: 'Drop markers on click to validate map events with the wrapper directly inside the no-key browser preview.',
         render: () => <ClickEventsNoKeyPreview />
       };
     case 'marker-info-window':
@@ -115,13 +115,13 @@ function getPreviewDefinition(id: string): PreviewDefinition {
     case 'advanced-markers':
       return {
         title: 'Advanced markers',
-        note: 'Advanced markers need a real browser key and map ID. This fallback keeps a working map visible while the main docs explain the live requirements.',
-        render: () => <FallbackBaseMapPreview label="Advanced markers require live mode" />
+        note: 'Advanced markers are documented here, but the no-key browser preview falls back to a stable base map surface so the docs never go blank.',
+        render: () => <FallbackBaseMapPreview label="Advanced markers use fallback preview" />
       };
     case 'draggable-marker':
       return {
         title: 'Draggable markers',
-        note: 'You can drag the marker and validate interaction without turning on full live mode.',
+        note: 'You can drag the marker and validate interaction directly in the no-key browser preview.',
         render: () => <DraggableNoKeyPreview />
       };
     case 'marker-clusterer':
@@ -145,32 +145,32 @@ function getPreviewDefinition(id: string): PreviewDefinition {
     case 'transport-layers':
       return {
         title: 'Traffic, transit, and bicycling layers',
-        note: 'These Google-managed layers are best validated with a real browser key. The iframe falls back to a stable base map preview.',
-        render: () => <FallbackBaseMapPreview label="Transport layers need live mode" />
+        note: 'These Google-managed layers stay documented, but the no-key browser preview falls back to a stable base map surface.',
+        render: () => <FallbackBaseMapPreview label="Transport layers use fallback preview" />
       };
     case 'kml-layer':
       return {
         title: 'KML layers',
-        note: 'KML loading depends on Google services. The no-key iframe keeps a stable map visible while the live docs explain the full workflow.',
-        render: () => <FallbackBaseMapPreview label="KML layers need live mode" />
+        note: 'KML loading depends on Google services. The no-key browser preview keeps a stable base map visible while the docs explain the wrapper workflow.',
+        render: () => <FallbackBaseMapPreview label="KML layers use fallback preview" />
       };
     case 'heatmap-layer':
       return {
         title: 'Heatmaps',
-        note: 'Heatmaps depend on the visualization library, so the no-key iframe uses a safe base map fallback.',
-        render: () => <FallbackBaseMapPreview label="Heatmaps need live mode" />
+        note: 'Heatmaps depend on the visualization library, so the no-key browser preview uses a safe base map fallback.',
+        render: () => <FallbackBaseMapPreview label="Heatmaps use fallback preview" />
       };
     case 'directions':
       return {
         title: 'Directions',
-        note: 'Directions calls need the Directions API enabled. This iframe keeps the route stage visible with a safe base map fallback.',
-        render: () => <FallbackBaseMapPreview label="Directions need live mode" />
+        note: 'Directions calls depend on Google services, so this no-key browser preview keeps the route stage visible with a safe base map fallback.',
+        render: () => <FallbackBaseMapPreview label="Directions use fallback preview" />
       };
     case 'geocoder':
       return {
         title: 'Geocoding',
-        note: 'Geocoding needs the Geocoding API enabled. This iframe keeps a real map visible while the main docs explain the live hook usage.',
-        render: () => <FallbackBaseMapPreview label="Geocoding needs live mode" />
+        note: 'Geocoding depends on Google services, so this no-key browser preview keeps a real map visible while the docs explain the hook usage.',
+        render: () => <FallbackBaseMapPreview label="Geocoding uses fallback preview" />
       };
     case 'custom-cluster-html':
       return {
@@ -423,7 +423,7 @@ function FallbackBaseMapPreview({ label }: { label: string }) {
     <div className="wrapper-preview-stack">
       <div className="wrapper-preview-note wrapper-preview-note--inline">
         <strong>{label}</strong>
-        <p>This specific scenario needs a real browser key or extra Google APIs. The base map stays visible here so the docs never feel blank.</p>
+        <p>This specific scenario depends on extra Google APIs that are outside the no-key docs runtime. The base map stays visible here so the docs never feel blank.</p>
       </div>
       <GoogleMap center={NEW_YORK} zoom={10} height={420}>
         <MapMarker position={NEW_YORK} title="New York City" />

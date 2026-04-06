@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   createClusterRenderer,
   GoogleMap,
@@ -43,15 +43,10 @@ type ExampleDefinition = {
 };
 
 type ExampleContext = {
-  apiKey: string;
-  mapId: string;
   pushLog: (message: string) => void;
 };
 
-const API_KEY_STORAGE_KEY = '@revivejs/react-google-maps/demo-api-key';
-const MAP_ID_STORAGE_KEY = '@revivejs/react-google-maps/demo-map-id';
 const DEFAULT_MAP_ID = 'DEMO_MAP_ID';
-const DEFAULT_DEMO_API_KEY = 'NoValidNoValidNoValidNoValidNoValidNoVa';
 
 const INSTALL_CODE = `npm install @revivejs/react-google-maps`;
 
@@ -59,7 +54,7 @@ const PROVIDER_CODE = `import { GoogleMapsProvider, GoogleMap, MapMarker } from 
 
 function App() {
   return (
-    <GoogleMapsProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} mapIds={['DEMO_MAP_ID']}>
+    <GoogleMapsProvider>
       <GoogleMap center={{ lat: 40.7128, lng: -74.006 }} zoom={11} height={420}>
         <MapMarker position={{ lat: 40.7128, lng: -74.006 }} />
       </GoogleMap>
@@ -71,7 +66,7 @@ const PROVIDER_ONLY_CODE = `import { GoogleMapsProvider } from '@revivejs/react-
 
 function Root() {
   return (
-    <GoogleMapsProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} mapIds={['DEMO_MAP_ID']}>
+    <GoogleMapsProvider>
       <App />
     </GoogleMapsProvider>
   );
@@ -95,7 +90,7 @@ const center = { lat: 40.7128, lng: -74.006 };
 
 export function BasicMap() {
   return (
-    <GoogleMapsProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
+    <GoogleMapsProvider>
       <GoogleMap center={center} zoom={11} height={420}>
         <MapMarker position={center} title="New York City" />
       </GoogleMap>
@@ -159,11 +154,6 @@ function stamp(message: string) {
   return `${new Date().toLocaleTimeString('en-US', { hour12: false })} ${message}`;
 }
 
-function isLiveApiKey(value: string) {
-  const normalized = value.trim();
-  return normalized.length > 0 && normalized !== DEFAULT_DEMO_API_KEY;
-}
-
 function codeExample(title: string, content: string) {
   return `// ${title}\n${content}`;
 }
@@ -193,50 +183,15 @@ const DOC_SECTIONS = [
 ] as const;
 
 export default function App({ reactLine, reactVersion, docsPath, packageVersion }: AppProps) {
-  const [apiKey, setApiKey] = useState(() =>
-    typeof window !== 'undefined' ? window.localStorage.getItem(API_KEY_STORAGE_KEY) || DEFAULT_DEMO_API_KEY : DEFAULT_DEMO_API_KEY
-  );
-  const [mapId, setMapId] = useState(() =>
-    typeof window !== 'undefined' ? window.localStorage.getItem(MAP_ID_STORAGE_KEY) || DEFAULT_MAP_ID : DEFAULT_MAP_ID
-  );
-  const [liveMode, setLiveMode] = useState(false);
   const [selectedId, setSelectedId] = useState('basic-roadmap');
-  const [logEntries, setLogEntries] = useState<string[]>(() => [stamp(`Loaded docs line ${reactLine}.`)]);
-  const normalizedApiKey = apiKey.trim();
-  const hasLiveApiKey = isLiveApiKey(normalizedApiKey);
-  const isDevPreview = !liveMode || !hasLiveApiKey;
-  const runtimeApiKey = liveMode && hasLiveApiKey ? normalizedApiKey : DEFAULT_DEMO_API_KEY;
+  const [logEntries, setLogEntries] = useState<string[]>(() => [
+    stamp(`No-key browser preview mode active.`),
+    stamp(`Loaded docs line ${reactLine}.`)
+  ]);
 
   const pushLog = (message: string) => {
     setLogEntries((current) => [stamp(message), ...current].slice(0, 18));
   };
-
-  useEffect(() => {
-    const message = liveMode && hasLiveApiKey
-      ? 'Browser API key activated. Live Google Maps examples unlocked.'
-      : 'Mock API mode active. Replace the placeholder with a real browser API key and enable live maps.';
-
-    setLogEntries((current) => {
-      if (current.some((entry) => entry.endsWith(message))) {
-        return current;
-      }
-      return [stamp(message), ...current].slice(0, 18);
-    });
-  }, [liveMode, hasLiveApiKey]);
-
-  useEffect(() => {
-    if (!hasLiveApiKey && liveMode) {
-      setLiveMode(false);
-    }
-  }, [hasLiveApiKey, liveMode]);
-
-  useEffect(() => {
-    localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
-  }, [apiKey]);
-
-  useEffect(() => {
-    localStorage.setItem(MAP_ID_STORAGE_KEY, mapId);
-  }, [mapId]);
 
   const examples = useMemo<ExampleDefinition[]>(
     () => [
@@ -247,14 +202,14 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
         description: 'The smallest useful setup: provider, map container, center, zoom, and a single marker.',
         code: codeExample(
           'Basic roadmap',
-          `<GoogleMapsProvider apiKey={apiKey}>
+          `<GoogleMapsProvider>
   <GoogleMap center={TORONTO} zoom={11} height={420}>
     <MapMarker position={TORONTO} />
   </GoogleMap>
 </GoogleMapsProvider>`
         ),
-        render: ({ apiKey, mapId, pushLog }) => (
-          <DemoSurface apiKey={apiKey} mapId={mapId}>
+        render: ({ pushLog }) => (
+          <DemoSurface>
             <GoogleMap center={TORONTO} zoom={11} height={420}>
               <MapMarker position={TORONTO} title="Toronto" onClick={() => pushLog('Toronto marker clicked.')} />
             </GoogleMap>
@@ -273,7 +228,7 @@ const [zoom, setZoom] = useState(10);
 
 <GoogleMap center={center} zoom={zoom} />`
         ),
-        render: ({ apiKey, mapId, pushLog }) => <ControlledCameraExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
+        render: ({ pushLog }) => <ControlledCameraExample pushLog={pushLog} />
       },
       {
         id: 'map-events',
@@ -287,7 +242,7 @@ const [zoom, setZoom] = useState(10);
   if (next) setMarkers((current) => [...current, next]);
 }} />`
         ),
-        render: ({ apiKey, mapId, pushLog }) => <MapClickExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
+        render: ({ pushLog }) => <MapClickExample pushLog={pushLog} />
       },
       {
         id: 'marker-info-window',
@@ -301,14 +256,14 @@ const [zoom, setZoom] = useState(10);
   <strong>{city.name}</strong>
 </MapInfoWindow>`
         ),
-        render: ({ apiKey, mapId, pushLog }) => <MarkerInfoWindowExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
+        render: ({ pushLog }) => <MarkerInfoWindowExample pushLog={pushLog} />
       },
       {
         id: 'advanced-markers',
         category: 'Test menu',
         title: 'Advanced markers',
         description: 'Render rich marker content without dropping down to imperative DOM management.',
-        note: 'Advanced markers require a mapId. The docs default to DEMO_MAP_ID so you can test quickly.',
+        note: 'This docs line stays in browser no-key mode, so the workbench shows the stable fallback preview for advanced markers while keeping the TypeScript usage visible.',
         code: codeExample(
           'Advanced marker HTML',
           `<MapAdvancedMarker position={OTTAWA}>
@@ -318,9 +273,9 @@ const [zoom, setZoom] = useState(10);
   </div>
 </MapAdvancedMarker>`
         ),
-        render: ({ apiKey, mapId, pushLog }) => (
-          <DemoSurface apiKey={apiKey} mapId={mapId}>
-            <GoogleMap center={OTTAWA} zoom={6} mapId={mapId} height={420}>
+        render: ({ pushLog }) => (
+          <DemoSurface>
+            <GoogleMap center={OTTAWA} zoom={6} mapId={DEFAULT_MAP_ID} height={420}>
               <MapAdvancedMarker position={OTTAWA} title="Ottawa" onClick={() => pushLog('Advanced marker Ottawa clicked.')}>
                 <div className="marker-chip">
                   <strong>Ottawa</strong>
@@ -350,7 +305,7 @@ const [zoom, setZoom] = useState(10);
   onDragEnd={(event) => setMarker(event.latLng!.toJSON())}
 />`
         ),
-        render: ({ apiKey, mapId, pushLog }) => <DraggableMarkerExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
+        render: ({ pushLog }) => <DraggableMarkerExample pushLog={pushLog} />
       },
       {
         id: 'marker-clusterer',
@@ -365,8 +320,8 @@ const [zoom, setZoom] = useState(10);
   ))}
 </MapMarkerClusterer>`
         ),
-        render: ({ apiKey, mapId, pushLog }) => (
-          <DemoSurface apiKey={apiKey} mapId={mapId}>
+        render: ({ pushLog }) => (
+          <DemoSurface>
             <GoogleMap center={SAN_FRANCISCO} zoom={8} height={420}>
               <MapMarkerClusterer onClusterClick={() => pushLog('Cluster clicked.')}>
                 {CLUSTER_POINTS.map((point, index) => (
@@ -398,8 +353,8 @@ const [zoom, setZoom] = useState(10);
   <MapAdvancedMarker position={point}>...</MapAdvancedMarker>
 </MapMarkerClusterer>`
         ),
-        render: ({ apiKey, mapId, pushLog }) => (
-          <CustomClusterHtmlExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
+        render: ({ pushLog }) => (
+          <CustomClusterHtmlExample pushLog={pushLog} />
         )
       },
       {
@@ -416,7 +371,7 @@ const [zoom, setZoom] = useState(10);
   <MapCircle center={TORONTO} radius={12000} />
 </GoogleMap>`
         ),
-        render: ({ apiKey, mapId, pushLog }) => <GeometryShapesExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
+        render: ({ pushLog }) => <GeometryShapesExample pushLog={pushLog} />
       },
       {
         id: 'ground-overlay',
@@ -430,8 +385,8 @@ const [zoom, setZoom] = useState(10);
   bounds={overlayBounds}
 />`
         ),
-        render: ({ apiKey, mapId, pushLog }) => (
-          <DemoSurface apiKey={apiKey} mapId={mapId}>
+        render: ({ pushLog }) => (
+          <DemoSurface>
             <GoogleMap center={{ lat: 62.323907, lng: -150.109291 }} zoom={10} height={420}>
               <MapGroundOverlay
                 url="https://developers.google.com/maps/documentation/javascript/examples/full/images/talkeetna.png"
@@ -454,7 +409,7 @@ const [zoom, setZoom] = useState(10);
 {showTransit && <MapTransitLayer />}
 {showBicycling && <MapBicyclingLayer />}`
         ),
-        render: ({ apiKey, mapId, pushLog }) => <TransportLayersExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
+        render: ({ pushLog }) => <TransportLayersExample pushLog={pushLog} />
       },
       {
         id: 'kml-layer',
@@ -465,8 +420,8 @@ const [zoom, setZoom] = useState(10);
           'KML layer',
           `<MapKmlLayer url="https://googlemaps.github.io/js-v2-samples/ggeoxml/cta.kml" />`
         ),
-        render: ({ apiKey, mapId, pushLog }) => (
-          <DemoSurface apiKey={apiKey} mapId={mapId}>
+        render: ({ pushLog }) => (
+          <DemoSurface>
             <GoogleMap center={CHICAGO} zoom={10} height={420}>
               <MapKmlLayer
                 url="https://googlemaps.github.io/js-v2-samples/ggeoxml/cta.kml"
@@ -488,8 +443,8 @@ const [zoom, setZoom] = useState(10);
   { location: OTTAWA, weight: 2 }
 ]} />`
         ),
-        render: ({ apiKey, mapId, pushLog }) => (
-          <DemoSurface apiKey={apiKey} mapId={mapId}>
+        render: ({ pushLog }) => (
+          <DemoSurface>
             <GoogleMap center={OTTAWA} zoom={5} height={420}>
               <MapHeatmapLayer
                 data={[
@@ -511,26 +466,26 @@ const [zoom, setZoom] = useState(10);
         category: 'Test menu',
         title: 'Directions',
         description: 'Keep route requests declarative with a renderless service component and a visual renderer.',
-        note: 'This example requires the Directions API to be enabled for the API key in Google Cloud.',
+        note: 'This docs line stays in browser no-key mode, so the workbench uses the stable fallback preview while the code sample documents the full directions integration.',
         code: codeExample(
           'Directions workflow',
           `<MapDirectionsService request={request} onResult={({ result }) => setDirections(result)} />
 <MapDirectionsRenderer directions={directions} />`
         ),
-        render: ({ apiKey, mapId, pushLog }) => <DirectionsExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
+        render: ({ pushLog }) => <DirectionsExample pushLog={pushLog} />
       },
       {
         id: 'geocoder',
         category: 'Test menu',
         title: 'Geocoding',
         description: 'Use a React hook for address lookup and update the map with the geocoded result.',
-        note: 'This example requires the Geocoding API to be enabled for the API key in Google Cloud.',
+        note: 'This docs line stays in browser no-key mode, so the workbench uses the stable fallback preview while the code sample documents the full geocoding integration.',
         code: codeExample(
           'Geocoding hook',
           `const geocoder = useMapGeocoder();
 const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
         ),
-        render: ({ apiKey, mapId, pushLog }) => <GeocoderExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
+        render: ({ pushLog }) => <GeocoderExample pushLog={pushLog} />
       },
       {
         id: 'custom-control',
@@ -544,7 +499,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
   <button onClick={() => mapRef.current?.fitBounds(bounds)}>Fit bounds</button>
 </MapControl>`
         ),
-        render: ({ apiKey, mapId, pushLog }) => <CustomControlExample apiKey={apiKey} mapId={mapId} pushLog={pushLog} />
+        render: ({ pushLog }) => <CustomControlExample pushLog={pushLog} />
       }
     ],
     []
@@ -576,22 +531,16 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                 <span className="meta-pill light">Hero showcase</span>
                 <h3>Google Maps first look</h3>
                 <p>
-                  {isDevPreview
-                    ? 'This hero map is the visual front door of the docs. The detailed testing surface lives below in the example workbench, where the left menu drives every map scenario.'
-                    : 'This hero map is a curated live showcase. Use the example workbench below to switch between markers, polygons, clustering, directions, controls, and every other test.'}
+                  This hero map is the visual front door of the docs. The detailed testing surface lives below in the example workbench, where the left menu drives every map scenario.
                 </p>
-                <p className="demo-note">Use the big example workbench below for real testing. The hero stays focused on first impression.</p>
+                <p className="demo-note">This whole docs line runs in browser no-key preview mode, so the page stays usable even without Google credentials.</p>
               </div>
             </div>
             <div className="quickstart-demo">
-              {isDevPreview ? (
-                <WrapperNoKeyPreview
-                  exampleId="hero-showcase"
-                  title="Hero showcase browser preview"
-                />
-              ) : (
-                <HeroShowcasePreview apiKey={runtimeApiKey} mapId={mapId} pushLog={pushLog} />
-              )}
+              <WrapperNoKeyPreview
+                exampleId="hero-showcase"
+                title="Hero showcase browser preview"
+              />
             </div>
           </div>
 
@@ -723,11 +672,9 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               </div>
 
               <div className="field-card">
-                <span>{isDevPreview ? 'About the top preview' : 'About the top preview'}</span>
+                <span>About the top preview</span>
                 <p>
-                  {isDevPreview
-                    ? 'The main hero already shows the wrapper preview in a dedicated full-width map row. This section stays focused on the code you should copy first.'
-                    : 'The main hero already shows the live map in a dedicated full-width row. This section stays focused on the exact code you should copy.'}
+                  The main hero already shows the wrapper preview in a dedicated full-width map row. This section stays focused on the exact code you should copy first.
                 </p>
                 <div className="inline-note inline-note--ready">
                   <strong>Recommended flow</strong>
@@ -766,49 +713,15 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               </div>
 
               <div className="field-card field-card--span">
-                <span>Live demo credentials</span>
+                <span>No-key docs mode</span>
                 <p>
-                  Paste a browser API key to unlock the live explorer. The docs open in mock mode by default so
-                  you can still browse setup, examples, and TypeScript patterns without immediately booting the API.
-                  The default value here is intentionally invalid, so you must replace it with a real browser
-                  key before the live map initializes. Advanced markers need a map ID. <code>DEMO_MAP_ID</code>
-                  works for demos. Directions and geocoding also need the corresponding Google APIs enabled for the same key.
+                  This documentation is intentionally built around a browser no-key preview because there is no shared Google key for the project.
+                  The hero and workbench still render a real map surface through isolated wrapper previews, while the code examples stay focused on the actual API you will use in your app.
                 </p>
-                <input
-                  className="text-input"
-                  type="password"
-                  value={apiKey}
-                  onChange={(event) => setApiKey(event.target.value)}
-                  placeholder="Paste a browser API key"
-                />
-                <input
-                  className="text-input"
-                  type="text"
-                  value={mapId}
-                  onChange={(event) => setMapId(event.target.value || DEFAULT_MAP_ID)}
-                  placeholder="DEMO_MAP_ID"
-                />
-                <div className="control-strip">
-                  <button
-                    type="button"
-                    onClick={() => setLiveMode(true)}
-                    disabled={!hasLiveApiKey}
-                  >
-                    Enable live maps
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLiveMode(false)}
-                  >
-                    Use mock API
-                  </button>
-                </div>
-                <div className={`inline-note ${isDevPreview ? 'inline-note--dev' : 'inline-note--ready'}`}>
-                  <strong>{isDevPreview ? 'Mock API mode is active.' : 'Live mode is active.'}</strong>
+                <div className="inline-note inline-note--ready">
+                  <strong>No credentials required to browse these docs.</strong>
                   <p>
-                    {isDevPreview
-                      ? 'The official Google Maps JavaScript API still requires authentication, so the docs stay in a stable mock mode until you intentionally enable the live runtime with a real browser key.'
-                      : 'Your key is present, so the examples below render the real Google Maps JavaScript API.'}
+                    The same components and snippets shown here are the ones used in a full app. Examples that depend on extra Google services are still documented below, even though this docs line itself stays fully keyless.
                   </p>
                 </div>
               </div>
@@ -920,31 +833,18 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               </div>
 
               <div className="example-workbench__map">
-                {isDevPreview ? (
-                  <WrapperNoKeyPreview
-                    exampleId={selected.id}
-                    title={`${selected.title} browser preview`}
-                  />
-                ) : (
-                  selected.render({ apiKey: runtimeApiKey, mapId, pushLog })
-                )}
+                <WrapperNoKeyPreview
+                  exampleId={selected.id}
+                  title={`${selected.title} browser preview`}
+                />
               </div>
 
               <div className="example-workbench__details">
                 <div className="example-workbench__note">
-                  {isDevPreview ? (
-                    <div className="inline-note inline-note--dev">
-                      <strong>Mock API mode is active for this example.</strong>
-                      <p>
-                        The workbench still switches examples correctly, but real Google Maps runtime behavior needs a browser key. Add a real key above and this exact stage will render the selected live example immediately.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="inline-note inline-note--ready">
-                      <strong>Live example active.</strong>
-                      <p>This workbench is currently running {selected.title}. Use the left menu to test a different live Google Maps behavior in the same stage.</p>
-                    </div>
-                  )}
+                  <div className="inline-note inline-note--ready">
+                    <strong>No-key browser preview active.</strong>
+                    <p>The workbench keeps rendering the selected scenario in an isolated browser preview, so the docs remain practical even without a shared Google Maps key.</p>
+                  </div>
                 </div>
 
                 <div className="demo-card demo-card--code">
@@ -1136,20 +1036,12 @@ function WrapperNoKeyPreview({
   );
 }
 
-function HeroShowcasePreview({
-  apiKey,
-  mapId,
-  pushLog
-}: {
-  apiKey: string;
-  mapId: string;
-  pushLog: (message: string) => void;
-}) {
+function HeroShowcasePreview({ pushLog }: { pushLog: (message: string) => void }) {
   const heroPoints = useMemo(() => CLUSTER_POINTS.slice(0, 18), []);
 
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
-      <GoogleMap center={SAN_FRANCISCO} zoom={9} mapId={mapId} height={460}>
+    <DemoSurface>
+      <GoogleMap center={SAN_FRANCISCO} zoom={9} mapId={DEFAULT_MAP_ID} height={460}>
         <MapPolygon
           paths={[
             { lat: 37.92, lng: -122.58 },
@@ -1196,94 +1088,11 @@ function HeroShowcasePreview({
   );
 }
 
-function DemoSurface({
-  apiKey,
-  mapId,
-  children
-}: {
-  apiKey: string;
-  mapId: string;
-  children: ReactNode;
-}) {
-  const normalizedApiKey = apiKey.trim();
-
-  if (!isLiveApiKey(normalizedApiKey)) {
-    return <DevModePreview mapId={mapId} />;
-  }
-
-  return (
-    <GoogleMapsProvider apiKey={normalizedApiKey} mapIds={[mapId]} libraries={['marker', 'places', 'geometry', 'visualization']}>
-      {children}
-    </GoogleMapsProvider>
-  );
+function DemoSurface({ children }: { children: ReactNode }) {
+  return <GoogleMapsProvider>{children}</GoogleMapsProvider>;
 }
 
-function DevModePreview({ mapId }: { mapId: string }) {
-  return (
-    <div className="dev-preview">
-      <div className="dev-preview__header">
-        <div>
-          <span className="meta-pill">Mock API</span>
-          <h4>Live map disabled until a browser API key is provided</h4>
-        </div>
-        <div className="dev-preview__meta">
-          <span>Map ID: {mapId || DEFAULT_MAP_ID}</span>
-          <span>Mode: docs mock API</span>
-        </div>
-      </div>
-
-      <p className="dev-preview__lead">
-        The real Google Maps JavaScript API does not run anonymously. This mock surface keeps the
-        example explorer, setup flow, TypeScript surfaces, and migration guidance visible so you can
-        wire your app first and only enable the live runtime when you are ready.
-      </p>
-
-      <div className="dev-preview__surface">
-        <div className="dev-preview__toolbar">
-          <span className="meta-pill light">GoogleMapsProvider</span>
-          <span className="meta-pill light">GoogleMap</span>
-          <span className="meta-pill light">MapMarker</span>
-          <span className="meta-pill light">AdvancedMarker</span>
-          <span className="meta-pill light">MarkerClusterer</span>
-        </div>
-
-        <div className="dev-preview__map">
-          <div className="dev-preview__grid" />
-          <div className="dev-preview__overlay dev-preview__overlay--north">drag, click, fitBounds, controls</div>
-          <div className="dev-preview__overlay dev-preview__overlay--west">markers</div>
-          <div className="dev-preview__overlay dev-preview__overlay--east">layers</div>
-          <div className="dev-preview__overlay dev-preview__overlay--south">directions, geocoder, shapes</div>
-
-          <div className="dev-pin dev-pin--a">
-            <strong>Marker</strong>
-            <span>Classic migration path</span>
-          </div>
-          <div className="dev-pin dev-pin--b">
-            <strong>AdvancedMarker</strong>
-            <span>HTML and branded cards</span>
-          </div>
-          <div className="dev-cluster">
-            <strong>12</strong>
-            <span>cluster</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="guide-grid guide-grid--two">
-        <div className="field-card">
-          <span>What still works without a key</span>
-          <p>Setup snippets, migration patterns, ref-based TypeScript APIs, example navigation, event log flow, and release-line docs.</p>
-        </div>
-        <div className="field-card">
-          <span>What needs a browser API key</span>
-          <p>Real Google basemap rendering, native map objects, services like directions/geocoding, transport layers, heatmaps, and KML loading.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ControlledCameraExample({ apiKey, mapId, pushLog }: ExampleContext) {
+function ControlledCameraExample({ pushLog }: ExampleContext) {
   const [center, setCenter] = useState(TORONTO);
   const [zoom, setZoom] = useState(10);
 
@@ -1301,7 +1110,7 @@ function ControlledCameraExample({ apiKey, mapId, pushLog }: ExampleContext) {
   }
 
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
+    <DemoSurface>
       <div className="control-strip">
         <button type="button" onClick={() => moveTo(TORONTO, 'Toronto')}>Toronto</button>
         <button type="button" onClick={() => moveTo(MONTREAL, 'Montreal')}>Montreal</button>
@@ -1316,11 +1125,11 @@ function ControlledCameraExample({ apiKey, mapId, pushLog }: ExampleContext) {
   );
 }
 
-function MapClickExample({ apiKey, mapId, pushLog }: ExampleContext) {
+function MapClickExample({ pushLog }: ExampleContext) {
   const [markers, setMarkers] = useState([TORONTO, OTTAWA]);
 
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
+    <DemoSurface>
       <GoogleMap
         center={OTTAWA}
         zoom={6}
@@ -1341,7 +1150,7 @@ function MapClickExample({ apiKey, mapId, pushLog }: ExampleContext) {
   );
 }
 
-function MarkerInfoWindowExample({ apiKey, mapId, pushLog }: ExampleContext) {
+function MarkerInfoWindowExample({ pushLog }: ExampleContext) {
   const cities = [
     { id: 'toronto', name: 'Toronto', position: TORONTO, text: 'Ontario capital and a common migration example base.' },
     { id: 'ottawa', name: 'Ottawa', position: OTTAWA, text: 'Good midpoint for routing demos and government data.' },
@@ -1351,7 +1160,7 @@ function MarkerInfoWindowExample({ apiKey, mapId, pushLog }: ExampleContext) {
   const markerRefs = useRef<Record<string, google.maps.Marker | null>>({});
 
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
+    <DemoSurface>
       <GoogleMap center={OTTAWA} zoom={6} height={420}>
         {cities.map((city) => (
           <MapMarker
@@ -1391,11 +1200,11 @@ function MarkerInfoWindowExample({ apiKey, mapId, pushLog }: ExampleContext) {
   );
 }
 
-function DraggableMarkerExample({ apiKey, mapId, pushLog }: ExampleContext) {
+function DraggableMarkerExample({ pushLog }: ExampleContext) {
   const [position, setPosition] = useState(TORONTO);
 
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
+    <DemoSurface>
       <GoogleMap center={position} zoom={10} height={420}>
         <MapMarker
           position={position}
@@ -1415,9 +1224,9 @@ function DraggableMarkerExample({ apiKey, mapId, pushLog }: ExampleContext) {
   );
 }
 
-function GeometryShapesExample({ apiKey, mapId, pushLog }: ExampleContext) {
+function GeometryShapesExample({ pushLog }: ExampleContext) {
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
+    <DemoSurface>
       <GoogleMap center={OTTAWA} zoom={6} height={420}>
         <MapPolyline
           path={[TORONTO, OTTAWA, MONTREAL]}
@@ -1458,7 +1267,7 @@ function GeometryShapesExample({ apiKey, mapId, pushLog }: ExampleContext) {
   );
 }
 
-function CustomClusterHtmlExample({ apiKey, mapId, pushLog }: ExampleContext) {
+function CustomClusterHtmlExample({ pushLog }: ExampleContext) {
   const renderer = useMemo(
     () =>
       createClusterRenderer({
@@ -1482,8 +1291,8 @@ function CustomClusterHtmlExample({ apiKey, mapId, pushLog }: ExampleContext) {
   );
 
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
-      <GoogleMap center={SAN_FRANCISCO} zoom={8} mapId={mapId} height={420}>
+    <DemoSurface>
+      <GoogleMap center={SAN_FRANCISCO} zoom={8} mapId={DEFAULT_MAP_ID} height={420}>
         <MapMarkerClusterer
           renderer={renderer}
           onClusterClick={() => pushLog('Custom HTML cluster clicked.')}
@@ -1507,13 +1316,13 @@ function CustomClusterHtmlExample({ apiKey, mapId, pushLog }: ExampleContext) {
   );
 }
 
-function TransportLayersExample({ apiKey, mapId, pushLog }: ExampleContext) {
+function TransportLayersExample({ pushLog }: ExampleContext) {
   const [traffic, setTraffic] = useState(true);
   const [transit, setTransit] = useState(false);
   const [bicycling, setBicycling] = useState(false);
 
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
+    <DemoSurface>
       <div className="control-strip">
         <button type="button" onClick={() => { setTraffic((current) => !current); pushLog(`Traffic layer ${traffic ? 'disabled' : 'enabled'}.`); }}>Traffic</button>
         <button type="button" onClick={() => { setTransit((current) => !current); pushLog(`Transit layer ${transit ? 'disabled' : 'enabled'}.`); }}>Transit</button>
@@ -1528,12 +1337,12 @@ function TransportLayersExample({ apiKey, mapId, pushLog }: ExampleContext) {
   );
 }
 
-function DirectionsExample({ apiKey, mapId, pushLog }: ExampleContext) {
+function DirectionsExample({ pushLog }: ExampleContext) {
   const [travelMode, setTravelMode] = useState<google.maps.TravelMode>('DRIVING' as google.maps.TravelMode);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
 
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
+    <DemoSurface>
       <div className="control-strip">
         <button type="button" onClick={() => setTravelMode('DRIVING' as google.maps.TravelMode)}>Driving</button>
         <button type="button" onClick={() => setTravelMode('TRANSIT' as google.maps.TravelMode)}>Transit</button>
@@ -1560,9 +1369,9 @@ function DirectionsExample({ apiKey, mapId, pushLog }: ExampleContext) {
   );
 }
 
-function GeocoderExample({ apiKey, mapId, pushLog }: ExampleContext) {
+function GeocoderExample({ pushLog }: ExampleContext) {
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
+    <DemoSurface>
       <GeocoderInner pushLog={pushLog} />
     </DemoSurface>
   );
@@ -1608,7 +1417,7 @@ function GeocoderInner({ pushLog }: { pushLog: (message: string) => void }) {
   );
 }
 
-function CustomControlExample({ apiKey, mapId, pushLog }: ExampleContext) {
+function CustomControlExample({ pushLog }: ExampleContext) {
   const mapRef = useRef<GoogleMapHandle>(null);
   const topCenter = ((window as any).google?.maps?.ControlPosition?.TOP_CENTER ?? 2) as google.maps.ControlPosition;
   const bounds = {
@@ -1619,7 +1428,7 @@ function CustomControlExample({ apiKey, mapId, pushLog }: ExampleContext) {
   };
 
   return (
-    <DemoSurface apiKey={apiKey} mapId={mapId}>
+    <DemoSurface>
       <GoogleMap ref={mapRef} center={OTTAWA} zoom={6} height={420}>
         <MapControl position={topCenter}>
           <div className="map-control">
