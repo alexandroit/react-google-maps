@@ -173,20 +173,22 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
   const [mapId, setMapId] = useState(() =>
     typeof window !== 'undefined' ? window.localStorage.getItem(MAP_ID_STORAGE_KEY) || DEFAULT_MAP_ID : DEFAULT_MAP_ID
   );
+  const [liveMode, setLiveMode] = useState(false);
   const [selectedId, setSelectedId] = useState('basic-roadmap');
   const [logEntries, setLogEntries] = useState<string[]>(() => [stamp(`Loaded docs line ${reactLine}.`)]);
   const normalizedApiKey = apiKey.trim();
   const hasLiveApiKey = isLiveApiKey(normalizedApiKey);
-  const isDevPreview = !hasLiveApiKey;
+  const isDevPreview = !liveMode || !hasLiveApiKey;
+  const runtimeApiKey = liveMode && hasLiveApiKey ? normalizedApiKey : DEFAULT_DEMO_API_KEY;
 
   const pushLog = (message: string) => {
     setLogEntries((current) => [stamp(message), ...current].slice(0, 18));
   };
 
   useEffect(() => {
-    const message = isDevPreview
-      ? 'Developer preview mode active. Add a browser API key to unlock live maps.'
-      : 'Browser API key detected. Live Google Maps examples unlocked.';
+    const message = liveMode && hasLiveApiKey
+      ? 'Browser API key activated. Live Google Maps examples unlocked.'
+      : 'Mock API mode active. Replace the placeholder with a real browser API key and enable live maps.';
 
     setLogEntries((current) => {
       if (current.some((entry) => entry.endsWith(message))) {
@@ -194,7 +196,13 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
       }
       return [stamp(message), ...current].slice(0, 18);
     });
-  }, [isDevPreview]);
+  }, [liveMode, hasLiveApiKey]);
+
+  useEffect(() => {
+    if (!hasLiveApiKey && liveMode) {
+      setLiveMode(false);
+    }
+  }, [hasLiveApiKey, liveMode]);
 
   useEffect(() => {
     localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
@@ -700,11 +708,11 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               <div className="field-card">
                 <span>Live minimal map</span>
                 <p>
-                  With a browser API key, this panel renders the real map immediately. Without a key,
-                  it falls back to the docs developer preview instead of looking broken.
+                  This panel stays in mock mode by default. Replace the placeholder with a real browser
+                  API key and click <code>Enable live maps</code> when you want the actual Google Maps runtime.
                 </p>
                 <div className="quickstart-demo">
-                  <DemoSurface apiKey={apiKey} mapId={mapId}>
+                  <DemoSurface apiKey={runtimeApiKey} mapId={mapId}>
                     <GoogleMap center={NEW_YORK} zoom={11} height={420}>
                       <MapMarker
                         position={NEW_YORK}
@@ -748,8 +756,8 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               <div className="field-card">
                 <span>Live demo credentials</span>
                 <p>
-                  Paste a browser API key to unlock the live explorer. Without a key, the docs stay in
-                  a developer preview mode so you can still browse setup, examples, and TypeScript patterns.
+                  Paste a browser API key to unlock the live explorer. The docs open in mock mode by default so
+                  you can still browse setup, examples, and TypeScript patterns without immediately booting the API.
                   The default value here is intentionally invalid, so you must replace it with a real browser
                   key before the live map initializes. Advanced markers need a map ID. <code>DEMO_MAP_ID</code>
                   works for demos. Directions and geocoding also need the corresponding Google APIs enabled for the same key.
@@ -768,11 +776,26 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                   onChange={(event) => setMapId(event.target.value || DEFAULT_MAP_ID)}
                   placeholder="DEMO_MAP_ID"
                 />
+                <div className="control-strip">
+                  <button
+                    type="button"
+                    onClick={() => setLiveMode(true)}
+                    disabled={!hasLiveApiKey}
+                  >
+                    Enable live maps
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLiveMode(false)}
+                  >
+                    Use mock API
+                  </button>
+                </div>
                 <div className={`inline-note ${isDevPreview ? 'inline-note--dev' : 'inline-note--ready'}`}>
-                  <strong>{isDevPreview ? 'Developer preview mode is active.' : 'Live mode is active.'}</strong>
+                  <strong>{isDevPreview ? 'Mock API mode is active.' : 'Live mode is active.'}</strong>
                   <p>
                     {isDevPreview
-                      ? 'The official Google Maps JavaScript API still requires authentication, so the docs switch to a no-key preview instead of showing a broken map.'
+                      ? 'The official Google Maps JavaScript API still requires authentication, so the docs stay in a stable mock mode until you intentionally enable the live runtime with a real browser key.'
                       : 'Your key is present, so the examples below render the real Google Maps JavaScript API.'}
                   </p>
                 </div>
@@ -908,15 +931,16 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
 
                 {isDevPreview ? (
                   <div className="inline-note inline-note--dev">
-                    <strong>This example is currently in developer preview mode.</strong>
+                    <strong>This example is currently running in mock API mode.</strong>
                     <p>
-                      The structure, migration notes, and API surface stay visible without a key. Add a browser
-                      API key above whenever you want the live map, layers, services, and events to execute.
+                      The structure, migration notes, and API surface stay visible without booting the real API.
+                      Replace the placeholder with a real browser key and enable live maps above whenever you want
+                      the actual map, layers, services, and events to execute.
                     </p>
                   </div>
                 ) : null}
 
-                <div className="demo-card">{selected.render({ apiKey, mapId, pushLog })}</div>
+                <div className="demo-card">{selected.render({ apiKey: runtimeApiKey, mapId, pushLog })}</div>
               </div>
             </div>
           </article>
@@ -1071,19 +1095,19 @@ function DevModePreview({ mapId }: { mapId: string }) {
     <div className="dev-preview">
       <div className="dev-preview__header">
         <div>
-          <span className="meta-pill">Developer Preview</span>
+          <span className="meta-pill">Mock API</span>
           <h4>Live map disabled until a browser API key is provided</h4>
         </div>
         <div className="dev-preview__meta">
           <span>Map ID: {mapId || DEFAULT_MAP_ID}</span>
-          <span>Mode: no-key docs preview</span>
+          <span>Mode: docs mock API</span>
         </div>
       </div>
 
       <p className="dev-preview__lead">
-        The real Google Maps JavaScript API does not run anonymously. This docs build keeps the
-        example explorer, setup flow, TypeScript surfaces, and migration guidance visible so you
-        can wire your app first and add the key later.
+        The real Google Maps JavaScript API does not run anonymously. This mock surface keeps the
+        example explorer, setup flow, TypeScript surfaces, and migration guidance visible so you can
+        wire your app first and only enable the live runtime when you are ready.
       </p>
 
       <div className="dev-preview__surface">
