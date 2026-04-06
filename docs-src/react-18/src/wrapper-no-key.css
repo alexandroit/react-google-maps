@@ -1,0 +1,90 @@
+:root {
+  color: #102033;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(254, 228, 179, 0.45), transparent 32%),
+    radial-gradient(circle at left 18%, rgba(170, 219, 255, 0.35), transparent 28%),
+    linear-gradient(180deg, #fff9f0 0%, #f5fbff 55%, #eef4fb 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  padding: 18px;
+}
+
+.wrapper-preview-shell {
+  display: grid;
+  gap: 14px;
+}
+
+.wrapper-preview-status,
+.wrapper-preview-map-card,
+.wrapper-preview-note {
+  border: 1px solid rgba(16, 32, 51, 0.1);
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 16px 40px rgba(27, 66, 110, 0.08);
+}
+
+.wrapper-preview-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #0d5c9e;
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wrapper-preview-status strong,
+.wrapper-preview-note strong {
+  display: block;
+  margin: 10px 0 8px;
+  color: #102033;
+}
+
+.wrapper-preview-status p,
+.wrapper-preview-note p {
+  margin: 0;
+  line-height: 1.6;
+  color: #364b63;
+}
+
+.wrapper-preview-error {
+  margin-top: 10px !important;
+  color: #8c2b2b !important;
+}
+
+.wrapper-preview-status code {
+  font-family: Consolas, "Liberation Mono", monospace;
+  font-size: 0.9em;
+  background: rgba(13, 92, 158, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+@media (max-width: 720px) {
+  body {
+    padding: 10px;
+  }
+
+  .wrapper-preview-status,
+  .wrapper-preview-map-card,
+  .wrapper-preview-note {
+    padding: 14px;
+    border-radius: 16px;
+  }
+}

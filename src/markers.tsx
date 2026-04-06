@@ -158,7 +158,13 @@ export const MapMarker = forwardRef<MapMarkerHandle, MapMarkerProps>(function Ma
 ) {
   const map = useGoogleMap();
   const clustererContext = useContext(MarkerClustererContext);
+  const markerRef = useRef<google.maps.Marker | null>(null);
+  const onLoadRef = useRef(onLoad);
+  const onUnmountRef = useRef(onUnmount);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
+
+  onLoadRef.current = onLoad;
+  onUnmountRef.current = onUnmount;
 
   useImperativeHandle(
     ref,
@@ -214,20 +220,24 @@ export const MapMarker = forwardRef<MapMarkerHandle, MapMarkerProps>(function Ma
   );
 
   useEffect(() => {
-    if (!map || marker) {
+    if (!map || markerRef.current) {
       return;
     }
 
     const instance = new google.maps.Marker();
+    markerRef.current = instance;
     setMarker(instance);
-    onLoad?.(instance);
+    onLoadRef.current?.(instance);
 
     return () => {
-      onUnmount?.(instance);
+      google.maps.event.clearInstanceListeners(instance);
+      onUnmountRef.current?.(instance);
       clustererContext?.unregisterMarker(instance);
       instance.setMap(null);
+      markerRef.current = null;
+      setMarker(null);
     };
-  }, [map, marker]);
+  }, [map, clustererContext]);
 
   useEffect(() => {
     if (!marker || !map) {

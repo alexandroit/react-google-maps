@@ -5,7 +5,6 @@ import { resolve } from 'node:path';
 export default defineConfig({
   plugins: [react()],
   base: './',
-  publicDir: resolve(__dirname, '../shared-public'),
   resolve: {
     alias: {
       '@revivejs/react-google-maps': resolve(__dirname, '../../src/index.ts'),
@@ -18,6 +17,12 @@ export default defineConfig({
   },
   build: {
     outDir: '../../docs/react-18',
-    emptyOutDir: true
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        wrapperNoKey: resolve(__dirname, 'wrapper-no-key.html')
+      }
+    }
   }
 });

@@ -114,8 +114,14 @@ export const GoogleMap = forwardRef<GoogleMapHandle, GoogleMapProps>(function Go
 ) {
   const { isLoaded, status, error, google } = useGoogleMapsApi();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const onMapLoadRef = useRef(onMapLoad);
+  const onMapUnmountRef = useRef(onMapUnmount);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const initialMapIdRef = useRef(mapId);
+
+  onMapLoadRef.current = onMapLoad;
+  onMapUnmountRef.current = onMapUnmount;
 
   useImperativeHandle(
     ref,
@@ -186,7 +192,7 @@ export const GoogleMap = forwardRef<GoogleMapHandle, GoogleMapProps>(function Go
   );
 
   useEffect(() => {
-    if (!isLoaded || !google || !containerRef.current || map) {
+    if (!isLoaded || !google || !containerRef.current || mapRef.current) {
       return;
     }
 
@@ -199,14 +205,17 @@ export const GoogleMap = forwardRef<GoogleMapHandle, GoogleMapProps>(function Go
       })
     );
 
+    mapRef.current = nextMap;
     setMap(nextMap);
-    onMapLoad?.(nextMap);
+    onMapLoadRef.current?.(nextMap);
 
     return () => {
-      onMapUnmount?.(nextMap);
+      google.maps.event.clearInstanceListeners(nextMap);
+      onMapUnmountRef.current?.(nextMap);
+      mapRef.current = null;
       setMap(null);
     };
-  }, [isLoaded, google, map]);
+  }, [isLoaded, google]);
 
   useEffect(() => {
     if (!map) {

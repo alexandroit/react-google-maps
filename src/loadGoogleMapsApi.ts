@@ -1,5 +1,5 @@
 export type GoogleMapsApiLoadOptions = {
-  apiKey: string;
+  apiKey?: string;
   version?: string;
   language?: string;
   region?: string;
@@ -11,7 +11,7 @@ export type GoogleMapsApiLoadOptions = {
   nonce?: string;
 };
 
-const DEFAULT_LIBRARIES = ['marker', 'places', 'geometry', 'visualization'] as const;
+const DEFAULT_LIBRARIES = [] as const;
 
 let loaderPromise: Promise<typeof google> | null = null;
 let loadedOptionsKey: string | null = null;
@@ -24,10 +24,6 @@ export function getDefaultGoogleMapsLibraries() {
 export function loadGoogleMapsApi(options: GoogleMapsApiLoadOptions): Promise<typeof google> {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return Promise.reject(new Error('@revivejs/react-google-maps can only load the Google Maps API in a browser environment.'));
-  }
-
-  if (!options.apiKey) {
-    return Promise.reject(new Error('A Google Maps API key is required to load the Google Maps JavaScript API.'));
   }
 
   if (window.google?.maps) {
@@ -66,7 +62,7 @@ export function loadGoogleMapsApi(options: GoogleMapsApiLoadOptions): Promise<ty
     }
 
     const params = new URLSearchParams();
-    params.set('key', normalizedOptions.apiKey);
+    params.set('key', normalizedOptions.apiKey ?? '');
     params.set('v', normalizedOptions.version);
     params.set('loading', 'async');
     params.set('callback', callbackName);
@@ -125,7 +121,16 @@ export function loadGoogleMapsApi(options: GoogleMapsApiLoadOptions): Promise<ty
   return loaderPromise;
 }
 
-function normalizeLoaderOptions(options: GoogleMapsApiLoadOptions): Required<Omit<GoogleMapsApiLoadOptions, 'language' | 'region' | 'authReferrerPolicy' | 'channel' | 'solutionChannel' | 'nonce'>> & Pick<GoogleMapsApiLoadOptions, 'language' | 'region' | 'authReferrerPolicy' | 'channel' | 'solutionChannel' | 'nonce'> {
+type NormalizedGoogleMapsApiLoadOptions = Omit<
+  GoogleMapsApiLoadOptions,
+  'version' | 'libraries' | 'mapIds'
+> & {
+  version: string;
+  libraries: string[];
+  mapIds: string[];
+};
+
+function normalizeLoaderOptions(options: GoogleMapsApiLoadOptions): NormalizedGoogleMapsApiLoadOptions {
   return {
     ...options,
     version: options.version || 'weekly',

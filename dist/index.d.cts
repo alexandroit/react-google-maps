@@ -4,7 +4,7 @@ import { ReactNode, HTMLAttributes, CSSProperties } from 'react';
 import { Cluster, ClusterStats, Renderer, Algorithm, MarkerClusterer } from '@googlemaps/markerclusterer';
 
 type GoogleMapsApiLoadOptions = {
-    apiKey: string;
+    apiKey?: string;
     version?: string;
     language?: string;
     region?: string;
@@ -15,7 +15,7 @@ type GoogleMapsApiLoadOptions = {
     solutionChannel?: string;
     nonce?: string;
 };
-declare function getDefaultGoogleMapsLibraries(): ("marker" | "places" | "geometry" | "visualization")[];
+declare function getDefaultGoogleMapsLibraries(): never[];
 declare function loadGoogleMapsApi(options: GoogleMapsApiLoadOptions): Promise<typeof google>;
 
 type GoogleMapsProviderProps = GoogleMapsApiLoadOptions & {

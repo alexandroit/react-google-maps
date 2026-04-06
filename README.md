@@ -1,16 +1,16 @@
 # @revivejs/react-google-maps
 
-> A maintained **React 19 wrapper for Google Maps** with declarative maps, markers, advanced markers, clustering, overlays, directions, geocoding hooks, and versioned live demos.
+> A maintained **React 17 wrapper for Google Maps** with declarative maps, markers, advanced markers, clustering, overlays, directions, geocoding hooks, and versioned live demos.
 
 [![npm version](https://img.shields.io/npm/v/@revivejs/react-google-maps.svg?style=flat-square)](https://www.npmjs.com/package/@revivejs/react-google-maps)
 [![npm downloads](https://img.shields.io/npm/dt/@revivejs/react-google-maps.svg?style=flat-square)](https://www.npmjs.com/package/@revivejs/react-google-maps)
 [![license](https://img.shields.io/npm/l/@revivejs/react-google-maps.svg?style=flat-square)](https://github.com/alexandroit/react-google-maps/blob/main/LICENSE)
-[![React 19](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)](https://react.dev)
+[![React 17](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)](https://react.dev)
 [![Google Maps](https://img.shields.io/badge/Google%20Maps-JavaScript%20API-34a853?style=flat-square)](https://developers.google.com/maps/documentation/javascript)
 
 **[Documentation & Live Demos](https://alexandroit.github.io/react-google-maps/)** | **[npm](https://www.npmjs.com/package/@revivejs/react-google-maps)** | **[Issues](https://github.com/alexandroit/react-google-maps/issues)** | **[Repository](https://github.com/alexandroit/react-google-maps)**
 
-**Latest version:** `19.0.0`
+**Latest version:** `17.0.1`
 
 ## Why this library?
 
@@ -41,7 +41,7 @@ That means you can keep a typed React API for the 90% case and still drop to nat
 | :---: | :---: | :---: | :--- |
 | **19.0.0** | **19.2.x** | Maps, markers, advanced markers, clustering, shapes, layers, directions, geocoder | [React 19 demo](https://alexandroit.github.io/react-google-maps/react-19/) |
 | **18.0.0** | **18.3.x** | Maps, markers, advanced markers, clustering, shapes, layers, directions, geocoder | [React 18 demo](https://alexandroit.github.io/react-google-maps/react-18/) |
-| **17.0.0** | **17.0.x** | Maps, markers, advanced markers, clustering, shapes, layers, directions, geocoder | [React 17 demo](https://alexandroit.github.io/react-google-maps/react-17/) |
+| **17.0.1** | **17.0.x** | Maps, markers, advanced markers, clustering, shapes, layers, directions, geocoder | [React 17 demo](https://alexandroit.github.io/react-google-maps/react-17/) |
 
 ## Installation
 

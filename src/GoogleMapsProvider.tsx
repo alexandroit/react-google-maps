@@ -22,13 +22,6 @@ export function GoogleMapsProvider({ children, ...options }: GoogleMapsProviderP
   useEffect(() => {
     let cancelled = false;
 
-    if (!options.apiKey) {
-      setStatus('idle');
-      setError(null);
-      setGoogleApi(null);
-      return;
-    }
-
     setStatus((current) => (current === 'ready' ? current : 'loading'));
     setError(null);
 

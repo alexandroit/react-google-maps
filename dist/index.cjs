@@ -67,7 +67,7 @@ function useGoogleMapsApiContext() {
 }
 
 // src/loadGoogleMapsApi.ts
-var DEFAULT_LIBRARIES = ["marker", "places", "geometry", "visualization"];
+var DEFAULT_LIBRARIES = [];
 var loaderPromise = null;
 var loadedOptionsKey = null;
 function getDefaultGoogleMapsLibraries() {
@@ -76,9 +76,6 @@ function getDefaultGoogleMapsLibraries() {
 function loadGoogleMapsApi(options) {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return Promise.reject(new Error("@revivejs/react-google-maps can only load the Google Maps API in a browser environment."));
-  }
-  if (!options.apiKey) {
-    return Promise.reject(new Error("A Google Maps API key is required to load the Google Maps JavaScript API."));
   }
   if (window.google?.maps) {
     return Promise.resolve(window.google);
@@ -109,7 +106,7 @@ function loadGoogleMapsApi(options) {
       return;
     }
     const params = new URLSearchParams();
-    params.set("key", normalizedOptions.apiKey);
+    params.set("key", normalizedOptions.apiKey ?? "");
     params.set("v", normalizedOptions.version);
     params.set("loading", "async");
     params.set("callback", callbackName);
@@ -184,12 +181,6 @@ function GoogleMapsProvider({ children, ...options }) {
   });
   (0, import_react2.useEffect)(() => {
     let cancelled = false;
-    if (!options.apiKey) {
-      setStatus("idle");
-      setError(null);
-      setGoogleApi(null);
-      return;
-    }
     setStatus((current) => current === "ready" ? current : "loading");
     setError(null);
     loadGoogleMapsApi(options).then((googleNamespace) => {
@@ -422,8 +413,13 @@ var GoogleMap = (0, import_react4.forwardRef)(function GoogleMap2({
 }, ref) {
   const { isLoaded, status, error, google: google2 } = useGoogleMapsApi();
   const containerRef = (0, import_react4.useRef)(null);
+  const mapRef = (0, import_react4.useRef)(null);
+  const onMapLoadRef = (0, import_react4.useRef)(onMapLoad);
+  const onMapUnmountRef = (0, import_react4.useRef)(onMapUnmount);
   const [map, setMap] = (0, import_react4.useState)(null);
   const initialMapIdRef = (0, import_react4.useRef)(mapId);
+  onMapLoadRef.current = onMapLoad;
+  onMapUnmountRef.current = onMapUnmount;
   (0, import_react4.useImperativeHandle)(
     ref,
     () => ({
@@ -492,7 +488,7 @@ var GoogleMap = (0, import_react4.forwardRef)(function GoogleMap2({
     [map]
   );
   (0, import_react4.useEffect)(() => {
-    if (!isLoaded || !google2 || !containerRef.current || map) {
+    if (!isLoaded || !google2 || !containerRef.current || mapRef.current) {
       return;
     }
     const nextMap = new google2.maps.Map(
@@ -503,13 +499,16 @@ var GoogleMap = (0, import_react4.forwardRef)(function GoogleMap2({
         mapId: initialMapIdRef.current
       })
     );
+    mapRef.current = nextMap;
     setMap(nextMap);
-    onMapLoad?.(nextMap);
+    onMapLoadRef.current?.(nextMap);
     return () => {
-      onMapUnmount?.(nextMap);
+      google2.maps.event.clearInstanceListeners(nextMap);
+      onMapUnmountRef.current?.(nextMap);
+      mapRef.current = null;
       setMap(null);
     };
-  }, [isLoaded, google2, map]);
+  }, [isLoaded, google2]);
   (0, import_react4.useEffect)(() => {
     if (!map) {
       return;
@@ -670,7 +669,12 @@ var MapMarker = (0, import_react5.forwardRef)(function MapMarker2({
 }, ref) {
   const map = useGoogleMap();
   const clustererContext = (0, import_react5.useContext)(MarkerClustererContext);
+  const markerRef = (0, import_react5.useRef)(null);
+  const onLoadRef = (0, import_react5.useRef)(onLoad);
+  const onUnmountRef = (0, import_react5.useRef)(onUnmount);
   const [marker, setMarker] = (0, import_react5.useState)(null);
+  onLoadRef.current = onLoad;
+  onUnmountRef.current = onUnmount;
   (0, import_react5.useImperativeHandle)(
     ref,
     () => ({
@@ -724,18 +728,22 @@ var MapMarker = (0, import_react5.forwardRef)(function MapMarker2({
     [marker]
   );
   (0, import_react5.useEffect)(() => {
-    if (!map || marker) {
+    if (!map || markerRef.current) {
       return;
     }
     const instance = new google.maps.Marker();
+    markerRef.current = instance;
     setMarker(instance);
-    onLoad?.(instance);
+    onLoadRef.current?.(instance);
     return () => {
-      onUnmount?.(instance);
+      google.maps.event.clearInstanceListeners(instance);
+      onUnmountRef.current?.(instance);
       clustererContext?.unregisterMarker(instance);
       instance.setMap(null);
+      markerRef.current = null;
+      setMarker(null);
     };
-  }, [map, marker]);
+  }, [map, clustererContext]);
   (0, import_react5.useEffect)(() => {
     if (!marker || !map) {
       return;

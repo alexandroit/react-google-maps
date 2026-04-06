@@ -52,7 +52,7 @@ const API_KEY_STORAGE_KEY = '@revivejs/react-google-maps/demo-api-key';
 const MAP_ID_STORAGE_KEY = '@revivejs/react-google-maps/demo-map-id';
 const DEFAULT_MAP_ID = 'DEMO_MAP_ID';
 const DEFAULT_DEMO_API_KEY = 'NoValidNoValidNoValidNoValidNoValidNoVa';
-const CLASSIC_NO_KEY_PREVIEW_PATH = './classic-no-key.html';
+const WRAPPER_NO_KEY_PREVIEW_PATH = './wrapper-no-key.html';
 
 const INSTALL_CODE = `npm install @revivejs/react-google-maps`;
 
@@ -647,7 +647,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             <span className="step-num">1</span>
             <div>
               <strong>Install</strong>
-              <pre>{INSTALL_CODE}</pre>
+              <CodeBlock title="Install command" code={INSTALL_CODE} compact />
             </div>
           </div>
 
@@ -655,7 +655,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             <span className="step-num">2</span>
             <div>
               <strong>Wrap your app with the provider</strong>
-              <pre>{PROVIDER_CODE}</pre>
+              <CodeBlock title="Provider setup" code={PROVIDER_CODE} compact />
             </div>
           </div>
 
@@ -663,7 +663,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
             <span className="step-num">3</span>
             <div>
               <strong>Keep migration simple</strong>
-              <pre>{MIGRATION_CODE}</pre>
+              <CodeBlock title="Migration mental model" code={MIGRATION_CODE} compact />
             </div>
           </div>
         </div>
@@ -696,23 +696,43 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               </p>
             </div>
 
-            <div className="quickstart-grid">
-              <div className="field-card">
+            <div className="showcase-stack">
+              <div className="quickstart-grid">
+              <div className="field-card field-card--code">
                 <span>Copy this first</span>
                 <p>
                   One provider, one map, one marker. This is the closest equivalent to the classic
                   Google Maps starter example, but in the wrapper API.
                 </p>
-                <pre>{CLASSIC_EXAMPLE_CODE}</pre>
+                <CodeBlock title="Classic quick start" code={CLASSIC_EXAMPLE_CODE} />
               </div>
 
               <div className="field-card">
-                <span>{isDevPreview ? 'Classic browser preview' : 'Live minimal map'}</span>
+                <span>{isDevPreview ? 'Preview mode' : 'Live mode'}</span>
                 <p>
                   {isDevPreview
-                    ? 'This panel mirrors the bare-bones browser behavior of the official Google Maps script with no key, but it is isolated from the rest of the docs so it does not make the full page blink or spam requests.'
-                    : 'You enabled live maps, so this panel is now running the wrapper version of the classic Google Maps hello-world example.'}
+                    ? 'The main docs stay stable while the isolated wrapper preview below shows the real no-key behavior of the library.'
+                    : 'Live maps are enabled, so the preview row below is running the wrapper version of the classic Google Maps hello-world example.'}
                 </p>
+                <div className="inline-note inline-note--ready">
+                  <strong>Recommended flow</strong>
+                  <p>Copy the snippet, confirm the preview row below, then move into the explorer once your base map is working.</p>
+                </div>
+              </div>
+              </div>
+
+              <div className="map-showcase">
+                <div className="map-showcase__header">
+                  <div>
+                    <span className="meta-pill light">{isDevPreview ? 'wrapper preview' : 'live map preview'}</span>
+                    <h3>{isDevPreview ? 'Wrapper no-key preview' : 'Classic quick start map'}</h3>
+                    <p>
+                      {isDevPreview
+                        ? 'This row runs the wrapper itself in an isolated page with no key, so you can validate the library behavior without destabilizing the rest of the docs.'
+                        : 'The map sits on its own exclusive row so the preview stays large and easy to validate while you test the simplest setup.'}
+                    </p>
+                  </div>
+                </div>
                 <div className="quickstart-demo">
                   <ClassicQuickStartPreview
                     apiKey={runtimeApiKey}
@@ -736,11 +756,11 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               </p>
             </div>
 
-            <div className="guide-grid">
+            <div className="guide-grid guide-grid--two loading-patterns-grid">
               <label className="field-card">
                 <span>Provider-first setup</span>
                 <p>The provider is the easiest option when you want React to own lifecycle, retries, loading, and versioned docs parity.</p>
-                <pre>{PROVIDER_CODE}</pre>
+                <CodeBlock title="Provider-first setup" code={PROVIDER_CODE} />
               </label>
 
               <div className="field-card">
@@ -749,10 +769,10 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                   If your team already injects Google Maps globally, keep that pattern. The provider
                   detects an existing <code>window.google.maps</code> and reuses it.
                 </p>
-                <pre>{INDEX_HTML_CODE}</pre>
+                <CodeBlock title="index.html script loading" code={INDEX_HTML_CODE} />
               </div>
 
-              <div className="field-card">
+              <div className="field-card field-card--span">
                 <span>Live demo credentials</span>
                 <p>
                   Paste a browser API key to unlock the live explorer. The docs open in mock mode by default so
@@ -815,13 +835,13 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               <div className="field-card">
                 <span>Mental model</span>
                 <p>Think of it as a declarative shell around the same native objects you already know.</p>
-                <pre>{MIGRATION_CODE}</pre>
+                <CodeBlock title="Migration mental model" code={MIGRATION_CODE} />
               </div>
 
               <div className="field-card">
                 <span>Imperative escape hatch</span>
                 <p>When an app needs full control, use refs and native handles instead of breaking out of the wrapper entirely.</p>
-                <pre>{REF_CODE}</pre>
+                <CodeBlock title="Imperative refs and handles" code={REF_CODE} />
               </div>
             </div>
           </article>
@@ -867,7 +887,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                   Use <code>createClusterRenderer()</code> when you want a higher-level helper, while still staying
                   on the official clusterer API from Google.
                 </p>
-                <pre>{CLUSTER_HELPER_CODE}</pre>
+                <CodeBlock title="Custom cluster renderer" code={CLUSTER_HELPER_CODE} />
               </div>
 
               <div className="field-card">
@@ -926,7 +946,9 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                   {selected.note ? <p className="demo-note">{selected.note}</p> : null}
                 </div>
 
-                <pre className="code">{selected.code}</pre>
+                <div className="demo-card demo-card--code">
+                  <CodeBlock title={`${selected.title} example`} code={selected.code} soft />
+                </div>
 
                 {isDevPreview ? (
                   <div className="inline-note inline-note--dev">
@@ -939,7 +961,16 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                   </div>
                 ) : null}
 
-                <div className="demo-card">{selected.render({ apiKey: runtimeApiKey, mapId, pushLog })}</div>
+                <div className="map-showcase">
+                  <div className="map-showcase__header">
+                    <div>
+                      <span className="meta-pill light">example preview</span>
+                      <h3>{selected.title} map preview</h3>
+                      <p>The map stays on its own dedicated row so the code remains readable and the runtime preview stays large enough for real testing.</p>
+                    </div>
+                  </div>
+                  <div className="demo-card demo-card--map">{selected.render({ apiKey: runtimeApiKey, mapId, pushLog })}</div>
+                </div>
               </div>
             </div>
           </article>
@@ -1067,6 +1098,42 @@ function groupExamples(examples: ExampleDefinition[]) {
   }));
 }
 
+function CodeBlock({
+  title,
+  code,
+  soft = false,
+  compact = false
+}: {
+  title: string;
+  code: string;
+  soft?: boolean;
+  compact?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+    }
+  }
+
+  return (
+    <div className={`code-block${soft ? ' code-block--soft' : ''}${compact ? ' code-block--compact' : ''}`}>
+      <div className="code-block__header">
+        <span className="code-block__title">{title}</span>
+        <button className="code-block__copy" type="button" onClick={handleCopy}>
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
+      <pre className={`code-block__pre${soft ? ' code' : ''}`}>{code}</pre>
+    </div>
+  );
+}
+
 function ClassicQuickStartPreview({
   apiKey,
   mapId,
@@ -1083,10 +1150,10 @@ function ClassicQuickStartPreview({
       <div className="classic-preview-stack">
         <ClassicNoKeyPreview />
         <div className="inline-note inline-note--dev">
-          <strong>No-key browser preview is active.</strong>
+          <strong>Wrapper no-key preview is active.</strong>
           <p>
-            This is the closest match to the simple script-tag example you shared. It stays isolated inside an iframe so
-            the official Google runtime can fail gracefully without destabilizing the full docs app.
+            This isolated page boots <code>GoogleMapsProvider</code>, <code>GoogleMap</code>, and <code>MapMarker</code> with no key.
+            It lets you validate the actual wrapper behavior without forcing the main docs app to load Google Maps globally.
           </p>
         </div>
       </div>
@@ -1132,8 +1199,8 @@ function ClassicNoKeyPreview() {
   return (
     <iframe
       className="classic-preview-frame"
-      title="Classic Google Maps no-key browser preview"
-      src={CLASSIC_NO_KEY_PREVIEW_PATH}
+      title="React Google Maps wrapper no-key preview"
+      src={WRAPPER_NO_KEY_PREVIEW_PATH}
       loading="lazy"
       referrerPolicy="no-referrer"
     />
