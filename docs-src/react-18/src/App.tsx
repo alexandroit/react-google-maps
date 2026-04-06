@@ -66,6 +66,20 @@ function App() {
   );
 }`;
 
+const CLASSIC_EXAMPLE_CODE = `import { GoogleMapsProvider, GoogleMap, MapMarker } from '@revivejs/react-google-maps';
+
+const center = { lat: 40.7128, lng: -74.006 };
+
+export function BasicMap() {
+  return (
+    <GoogleMapsProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
+      <GoogleMap center={center} zoom={11} height={420}>
+        <MapMarker position={center} title="New York City" />
+      </GoogleMap>
+    </GoogleMapsProvider>
+  );
+}`;
+
 const INDEX_HTML_CODE = `<!-- index.html -->
 <script>
   (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;
@@ -136,6 +150,7 @@ function randomPoints(center: google.maps.LatLngLiteral, count: number) {
 const CLUSTER_POINTS = randomPoints(SAN_FRANCISCO, 36);
 const DOC_SECTIONS = [
   { id: 'overview', label: 'Overview' },
+  { id: 'quickstart', label: 'Classic Quick Start' },
   { id: 'setup', label: 'Setup' },
   { id: 'loading', label: 'Loading Patterns' },
   { id: 'migration', label: 'Migration Guide' },
@@ -655,6 +670,52 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
 
         <section className="layout" id="examples">
         <div className="panels">
+          <article className="panel quickstart-panel" id="quickstart">
+            <div className="panel-header">
+              <h2>Classic Google Maps quick start</h2>
+              <p>
+                This is the smallest working example in the whole docs. If you are looking for the
+                normal Google Maps "hello world" experience in React, start here before moving on
+                to advanced markers, clustering, directions, and custom overlays.
+              </p>
+            </div>
+
+            <div className="quickstart-grid">
+              <div className="field-card">
+                <span>Copy this first</span>
+                <p>
+                  One provider, one map, one marker. This is the closest equivalent to the classic
+                  Google Maps starter example, but in the wrapper API.
+                </p>
+                <pre>{CLASSIC_EXAMPLE_CODE}</pre>
+              </div>
+
+              <div className="field-card">
+                <span>Live minimal map</span>
+                <p>
+                  With a browser API key, this panel renders the real map immediately. Without a key,
+                  it falls back to the docs developer preview instead of looking broken.
+                </p>
+                <div className="quickstart-demo">
+                  <DemoSurface apiKey={apiKey} mapId={mapId}>
+                    <GoogleMap
+                      center={NEW_YORK}
+                      zoom={11}
+                      height={420}
+                      onIdle={() => pushLog('Classic quick start map loaded.')}
+                    >
+                      <MapMarker
+                        position={NEW_YORK}
+                        title="New York City"
+                        onClick={() => pushLog('Classic quick start marker clicked.')}
+                      />
+                    </GoogleMap>
+                  </DemoSurface>
+                </div>
+              </div>
+            </div>
+          </article>
+
           <article className="panel" id="loading">
             <div className="panel-header">
               <h2>Loading patterns</h2>
