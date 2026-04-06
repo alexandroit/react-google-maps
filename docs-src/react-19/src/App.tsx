@@ -154,10 +154,25 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
   );
   const [selectedId, setSelectedId] = useState('basic-roadmap');
   const [logEntries, setLogEntries] = useState<string[]>(() => [stamp(`Loaded docs line ${reactLine}.`)]);
+  const normalizedApiKey = apiKey.trim();
+  const isDevPreview = normalizedApiKey.length === 0;
 
   const pushLog = (message: string) => {
     setLogEntries((current) => [stamp(message), ...current].slice(0, 18));
   };
+
+  useEffect(() => {
+    const message = isDevPreview
+      ? 'Developer preview mode active. Add a browser API key to unlock live maps.'
+      : 'Browser API key detected. Live Google Maps examples unlocked.';
+
+    setLogEntries((current) => {
+      if (current.some((entry) => entry.endsWith(message))) {
+        return current;
+      }
+      return [stamp(message), ...current].slice(0, 18);
+    });
+  }, [isDevPreview]);
 
   useEffect(() => {
     localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
@@ -670,9 +685,10 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               <div className="field-card">
                 <span>Live demo credentials</span>
                 <p>
-                  Paste a browser API key to unlock the live explorer. Advanced markers need a map ID.
-                  <code>DEMO_MAP_ID</code> works for demos. Directions and geocoding also need the
-                  corresponding Google APIs enabled for the same key.
+                  Paste a browser API key to unlock the live explorer. Without a key, the docs stay in
+                  a developer preview mode so you can still browse setup, examples, and TypeScript patterns.
+                  Advanced markers need a map ID. <code>DEMO_MAP_ID</code> works for demos. Directions and
+                  geocoding also need the corresponding Google APIs enabled for the same key.
                 </p>
                 <input
                   className="text-input"
@@ -688,6 +704,14 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                   onChange={(event) => setMapId(event.target.value || DEFAULT_MAP_ID)}
                   placeholder="DEMO_MAP_ID"
                 />
+                <div className={`inline-note ${isDevPreview ? 'inline-note--dev' : 'inline-note--ready'}`}>
+                  <strong>{isDevPreview ? 'Developer preview mode is active.' : 'Live mode is active.'}</strong>
+                  <p>
+                    {isDevPreview
+                      ? 'The official Google Maps JavaScript API still requires authentication, so the docs switch to a no-key preview instead of showing a broken map.'
+                      : 'Your key is present, so the examples below render the real Google Maps JavaScript API.'}
+                  </p>
+                </div>
               </div>
             </div>
           </article>
@@ -817,6 +841,16 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                 </div>
 
                 <pre className="code">{selected.code}</pre>
+
+                {isDevPreview ? (
+                  <div className="inline-note inline-note--dev">
+                    <strong>This example is currently in developer preview mode.</strong>
+                    <p>
+                      The structure, migration notes, and API surface stay visible without a key. Add a browser
+                      API key above whenever you want the live map, layers, services, and events to execute.
+                    </p>
+                  </div>
+                ) : null}
 
                 <div className="demo-card">{selected.render({ apiKey, mapId, pushLog })}</div>
               </div>
@@ -955,19 +989,81 @@ function DemoSurface({
   mapId: string;
   children: ReactNode;
 }) {
-  if (!apiKey) {
-    return (
-      <div className="api-key-empty">
-        <strong>Add a browser API key to unlock the live demo.</strong>
-        <p>The docs shell and code samples work without a key, but live Google Maps examples require one.</p>
-      </div>
-    );
+  const normalizedApiKey = apiKey.trim();
+
+  if (!normalizedApiKey) {
+    return <DevModePreview mapId={mapId} />;
   }
 
   return (
-    <GoogleMapsProvider apiKey={apiKey} mapIds={[mapId]} libraries={['marker', 'places', 'geometry', 'visualization']}>
+    <GoogleMapsProvider apiKey={normalizedApiKey} mapIds={[mapId]} libraries={['marker', 'places', 'geometry', 'visualization']}>
       {children}
     </GoogleMapsProvider>
+  );
+}
+
+function DevModePreview({ mapId }: { mapId: string }) {
+  return (
+    <div className="dev-preview">
+      <div className="dev-preview__header">
+        <div>
+          <span className="meta-pill">Developer Preview</span>
+          <h4>Live map disabled until a browser API key is provided</h4>
+        </div>
+        <div className="dev-preview__meta">
+          <span>Map ID: {mapId || DEFAULT_MAP_ID}</span>
+          <span>Mode: no-key docs preview</span>
+        </div>
+      </div>
+
+      <p className="dev-preview__lead">
+        The real Google Maps JavaScript API does not run anonymously. This docs build keeps the
+        example explorer, setup flow, TypeScript surfaces, and migration guidance visible so you
+        can wire your app first and add the key later.
+      </p>
+
+      <div className="dev-preview__surface">
+        <div className="dev-preview__toolbar">
+          <span className="meta-pill light">GoogleMapsProvider</span>
+          <span className="meta-pill light">GoogleMap</span>
+          <span className="meta-pill light">MapMarker</span>
+          <span className="meta-pill light">AdvancedMarker</span>
+          <span className="meta-pill light">MarkerClusterer</span>
+        </div>
+
+        <div className="dev-preview__map">
+          <div className="dev-preview__grid" />
+          <div className="dev-preview__overlay dev-preview__overlay--north">drag, click, fitBounds, controls</div>
+          <div className="dev-preview__overlay dev-preview__overlay--west">markers</div>
+          <div className="dev-preview__overlay dev-preview__overlay--east">layers</div>
+          <div className="dev-preview__overlay dev-preview__overlay--south">directions, geocoder, shapes</div>
+
+          <div className="dev-pin dev-pin--a">
+            <strong>Marker</strong>
+            <span>Classic migration path</span>
+          </div>
+          <div className="dev-pin dev-pin--b">
+            <strong>AdvancedMarker</strong>
+            <span>HTML and branded cards</span>
+          </div>
+          <div className="dev-cluster">
+            <strong>12</strong>
+            <span>cluster</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="guide-grid guide-grid--two">
+        <div className="field-card">
+          <span>What still works without a key</span>
+          <p>Setup snippets, migration patterns, ref-based TypeScript APIs, example navigation, event log flow, and release-line docs.</p>
+        </div>
+        <div className="field-card">
+          <span>What needs a browser API key</span>
+          <p>Real Google basemap rendering, native map objects, services like directions/geocoding, transport layers, heatmaps, and KML loading.</p>
+        </div>
+      </div>
+    </div>
   );
 }
 

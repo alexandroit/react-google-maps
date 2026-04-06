@@ -413,6 +413,188 @@ pre.code {
   margin-top: 12px;
 }
 
+.inline-note strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #102033;
+}
+
+.inline-note--dev {
+  border-style: solid;
+  background: linear-gradient(180deg, rgba(255, 247, 232, 0.88) 0%, rgba(244, 249, 255, 0.92) 100%);
+}
+
+.inline-note--ready {
+  border-style: solid;
+  background: linear-gradient(180deg, rgba(239, 249, 244, 0.88) 0%, rgba(244, 249, 255, 0.92) 100%);
+}
+
+.dev-preview {
+  display: grid;
+  gap: 16px;
+}
+
+.dev-preview__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.dev-preview__header h4 {
+  margin-top: 10px;
+  font-size: 18px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #102033;
+}
+
+.dev-preview__meta {
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.dev-preview__meta span {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 32, 51, 0.08);
+  background: #f7fafc;
+  font-size: 13px;
+  color: #34495f;
+}
+
+.dev-preview__lead {
+  margin-top: -2px;
+}
+
+.dev-preview__surface {
+  display: grid;
+  gap: 12px;
+}
+
+.dev-preview__toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dev-preview__map {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(16, 32, 51, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(210, 75, 42, 0.22), transparent 26%),
+    radial-gradient(circle at left 28%, rgba(31, 91, 167, 0.18), transparent 30%),
+    linear-gradient(180deg, #f7fbff 0%, #eef4fb 100%);
+}
+
+.dev-preview__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(16, 32, 51, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 32, 51, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.65));
+}
+
+.dev-preview__overlay {
+  position: absolute;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 32, 51, 0.09);
+  background: rgba(255, 255, 255, 0.92);
+  color: #14324f;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 12px 24px rgba(16, 32, 51, 0.08);
+}
+
+.dev-preview__overlay--north {
+  top: 16px;
+  left: 16px;
+}
+
+.dev-preview__overlay--west {
+  top: 96px;
+  left: 24px;
+}
+
+.dev-preview__overlay--east {
+  top: 112px;
+  right: 24px;
+}
+
+.dev-preview__overlay--south {
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+}
+
+.dev-pin,
+.dev-cluster {
+  position: absolute;
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(16, 32, 51, 0.08);
+  box-shadow: 0 12px 28px rgba(16, 32, 51, 0.16);
+}
+
+.dev-pin {
+  min-width: 150px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #102033;
+}
+
+.dev-pin strong,
+.dev-cluster strong {
+  font-size: 13px;
+}
+
+.dev-pin span,
+.dev-cluster span {
+  font-size: 12px;
+  color: #4b6078;
+}
+
+.dev-pin--a {
+  left: 18%;
+  top: 48%;
+}
+
+.dev-pin--b {
+  right: 18%;
+  top: 34%;
+  background: rgba(16, 32, 51, 0.96);
+  color: #fff;
+}
+
+.dev-pin--b span {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.dev-cluster {
+  left: 50%;
+  top: 42%;
+  min-width: 82px;
+  transform: translate(-50%, -50%);
+  place-items: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #d24b2a 0%, #1f5ba7 100%);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+}
+
+.dev-cluster span {
+  color: rgba(255, 255, 255, 0.86);
+}
+
 .control-strip {
   display: flex;
   flex-wrap: wrap;
@@ -612,6 +794,15 @@ pre.code {
   .demo-nav {
     order: 2;
   }
+
+  .dev-preview__header {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .dev-preview__meta {
+    min-width: 0;
+  }
 }
 
 @media (max-width: 720px) {
@@ -638,5 +829,36 @@ pre.code {
 
   .control-strip button {
     width: 100%;
+  }
+
+  .dev-preview__map {
+    min-height: 300px;
+  }
+
+  .dev-preview__overlay {
+    position: static;
+    transform: none;
+    margin: 10px 10px 0;
+  }
+
+  .dev-preview__overlay--south {
+    margin-bottom: 0;
+  }
+
+  .dev-pin--a {
+    left: 10px;
+    top: 150px;
+    min-width: 122px;
+  }
+
+  .dev-pin--b {
+    right: 10px;
+    top: 78px;
+    min-width: 132px;
+  }
+
+  .dev-cluster {
+    left: 50%;
+    top: 210px;
   }
 }
