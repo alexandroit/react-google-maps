@@ -277,6 +277,20 @@ pre.code {
   min-width: 0;
 }
 
+.classic-preview-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.classic-preview-frame {
+  display: block;
+  width: 100%;
+  min-height: 420px;
+  border: 1px solid rgba(16, 32, 51, 0.08);
+  border-radius: 18px;
+  background: #edf4fa;
+}
+
 .credentials-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

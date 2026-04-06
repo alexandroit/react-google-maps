@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 export default defineConfig({
   plugins: [react()],
   base: './',
+  publicDir: resolve(__dirname, '../shared-public'),
   resolve: {
     alias: {
       '@revivejs/react-google-maps': resolve(__dirname, '../../src/index.ts'),

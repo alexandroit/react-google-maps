@@ -52,6 +52,7 @@ const API_KEY_STORAGE_KEY = '@revivejs/react-google-maps/demo-api-key';
 const MAP_ID_STORAGE_KEY = '@revivejs/react-google-maps/demo-map-id';
 const DEFAULT_MAP_ID = 'DEMO_MAP_ID';
 const DEFAULT_DEMO_API_KEY = 'NoValidNoValidNoValidNoValidNoValidNoVa';
+const CLASSIC_NO_KEY_PREVIEW_PATH = './classic-no-key.html';
 
 const INSTALL_CODE = `npm install @revivejs/react-google-maps`;
 
@@ -706,21 +707,19 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               </div>
 
               <div className="field-card">
-                <span>Live minimal map</span>
+                <span>{isDevPreview ? 'Classic browser preview' : 'Live minimal map'}</span>
                 <p>
-                  This panel stays in mock mode by default. Replace the placeholder with a real browser
-                  API key and click <code>Enable live maps</code> when you want the actual Google Maps runtime.
+                  {isDevPreview
+                    ? 'This panel mirrors the bare-bones browser behavior of the official Google Maps script with no key, but it is isolated from the rest of the docs so it does not make the full page blink or spam requests.'
+                    : 'You enabled live maps, so this panel is now running the wrapper version of the classic Google Maps hello-world example.'}
                 </p>
                 <div className="quickstart-demo">
-                  <DemoSurface apiKey={runtimeApiKey} mapId={mapId}>
-                    <GoogleMap center={NEW_YORK} zoom={11} height={420}>
-                      <MapMarker
-                        position={NEW_YORK}
-                        title="New York City"
-                        onClick={() => pushLog('Classic quick start marker clicked.')}
-                      />
-                    </GoogleMap>
-                  </DemoSurface>
+                  <ClassicQuickStartPreview
+                    apiKey={runtimeApiKey}
+                    mapId={mapId}
+                    isDevPreview={isDevPreview}
+                    pushLog={pushLog}
+                  />
                 </div>
               </div>
             </div>
@@ -1068,6 +1067,45 @@ function groupExamples(examples: ExampleDefinition[]) {
   }));
 }
 
+function ClassicQuickStartPreview({
+  apiKey,
+  mapId,
+  isDevPreview,
+  pushLog
+}: {
+  apiKey: string;
+  mapId: string;
+  isDevPreview: boolean;
+  pushLog: (message: string) => void;
+}) {
+  if (isDevPreview) {
+    return (
+      <div className="classic-preview-stack">
+        <ClassicNoKeyPreview />
+        <div className="inline-note inline-note--dev">
+          <strong>No-key browser preview is active.</strong>
+          <p>
+            This is the closest match to the simple script-tag example you shared. It stays isolated inside an iframe so
+            the official Google runtime can fail gracefully without destabilizing the full docs app.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <DemoSurface apiKey={apiKey} mapId={mapId}>
+      <GoogleMap center={NEW_YORK} zoom={11} height={420}>
+        <MapMarker
+          position={NEW_YORK}
+          title="New York City"
+          onClick={() => pushLog('Classic quick start marker clicked.')}
+        />
+      </GoogleMap>
+    </DemoSurface>
+  );
+}
+
 function DemoSurface({
   apiKey,
   mapId,
@@ -1087,6 +1125,18 @@ function DemoSurface({
     <GoogleMapsProvider apiKey={normalizedApiKey} mapIds={[mapId]} libraries={['marker', 'places', 'geometry', 'visualization']}>
       {children}
     </GoogleMapsProvider>
+  );
+}
+
+function ClassicNoKeyPreview() {
+  return (
+    <iframe
+      className="classic-preview-frame"
+      title="Classic Google Maps no-key browser preview"
+      src={CLASSIC_NO_KEY_PREVIEW_PATH}
+      loading="lazy"
+      referrerPolicy="no-referrer"
+    />
   );
 }
 
