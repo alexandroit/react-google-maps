@@ -168,6 +168,10 @@ function codeExample(title: string, content: string) {
   return `// ${title}\n${content}`;
 }
 
+function wrapperNoKeyPreviewPath(exampleId: string) {
+  return `./wrapper-no-key.html?example=${encodeURIComponent(exampleId)}`;
+}
+
 function randomPoints(center: google.maps.LatLngLiteral, count: number) {
   return Array.from({ length: count }, (_, index) => ({
     lat: center.lat + Math.sin(index * 1.17) * 0.12 + ((index % 3) - 1) * 0.01,
@@ -580,7 +584,14 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               </div>
             </div>
             <div className="quickstart-demo">
-              <HeroShowcasePreview apiKey={runtimeApiKey} mapId={mapId} pushLog={pushLog} />
+              {isDevPreview ? (
+                <WrapperNoKeyPreview
+                  exampleId="hero-showcase"
+                  title="Hero showcase browser preview"
+                />
+              ) : (
+                <HeroShowcasePreview apiKey={runtimeApiKey} mapId={mapId} pushLog={pushLog} />
+              )}
             </div>
           </div>
 
@@ -909,7 +920,14 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
               </div>
 
               <div className="example-workbench__map">
-                {selected.render({ apiKey: runtimeApiKey, mapId, pushLog })}
+                {isDevPreview ? (
+                  <WrapperNoKeyPreview
+                    exampleId={selected.id}
+                    title={`${selected.title} browser preview`}
+                  />
+                ) : (
+                  selected.render({ apiKey: runtimeApiKey, mapId, pushLog })
+                )}
               </div>
 
               <div className="example-workbench__details">
@@ -1097,6 +1115,24 @@ function CodeBlock({
       </div>
       <pre className={`code-block__pre${soft ? ' code' : ''}`}>{code}</pre>
     </div>
+  );
+}
+
+function WrapperNoKeyPreview({
+  exampleId,
+  title
+}: {
+  exampleId: string;
+  title: string;
+}) {
+  return (
+    <iframe
+      className="browser-preview-frame"
+      title={title}
+      src={wrapperNoKeyPreviewPath(exampleId)}
+      loading="lazy"
+      referrerPolicy="no-referrer"
+    />
   );
 }
 

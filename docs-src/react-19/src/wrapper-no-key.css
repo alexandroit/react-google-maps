@@ -27,6 +27,11 @@ body {
   gap: 14px;
 }
 
+.wrapper-preview-stack {
+  display: grid;
+  gap: 12px;
+}
+
 .wrapper-preview-status,
 .wrapper-preview-map-card,
 .wrapper-preview-note {
@@ -76,6 +81,27 @@ body {
   border-radius: 4px;
 }
 
+.wrapper-preview-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.wrapper-preview-toolbar button {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  background: #102033;
+  color: #fff;
+}
+
+.wrapper-preview-note--inline {
+  box-shadow: none;
+}
+
 @media (max-width: 720px) {
   body {
     padding: 10px;
@@ -86,5 +112,13 @@ body {
   .wrapper-preview-note {
     padding: 14px;
     border-radius: 16px;
+  }
+
+  .wrapper-preview-toolbar {
+    flex-direction: column;
+  }
+
+  .wrapper-preview-toolbar button {
+    width: 100%;
   }
 }
