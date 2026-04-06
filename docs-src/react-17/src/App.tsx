@@ -526,16 +526,6 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
           </p>
 
           <div className="map-showcase hero-map-showcase">
-            <div className="map-showcase__header">
-              <div>
-                <span className="meta-pill light">Hero showcase</span>
-                <h3>Google Maps first look</h3>
-                <p>
-                  This hero map is the visual front door of the docs. The detailed testing surface lives below in the example workbench, where the left menu drives every map scenario.
-                </p>
-                <p className="demo-note">This whole docs line runs in browser no-key preview mode, so the page stays usable even without Google credentials.</p>
-              </div>
-            </div>
             <div className="quickstart-demo">
               <WrapperNoKeyPreview
                 exampleId="hero-showcase"

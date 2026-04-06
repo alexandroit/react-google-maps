@@ -306,25 +306,20 @@ pre.code {
 .browser-preview-frame {
   display: block;
   width: 100%;
-  min-height: 460px;
+  height: 460px;
   border: 1px solid rgba(16, 32, 51, 0.08);
   border-radius: 18px;
   background: #edf4fa;
+  overflow: hidden;
 }
 
 .hero-map-showcase {
   margin-top: 4px;
-}
-
-.map-showcase__header {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  align-items: start;
-}
-
-.map-showcase__header h3 {
-  margin-top: 8px;
+  padding: 0;
+  gap: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .credentials-grid {
@@ -535,6 +530,7 @@ pre.code {
   border-radius: 18px;
   border: 1px solid rgba(16, 32, 51, 0.08);
   background: linear-gradient(180deg, #fff 0%, #f7fafc 100%);
+  overflow: hidden;
 }
 
 .example-workbench__details {
@@ -1022,9 +1018,6 @@ pre.code {
     min-width: 0;
   }
 
-  .map-showcase__header {
-    display: grid;
-  }
 }
 
 @media (max-width: 720px) {

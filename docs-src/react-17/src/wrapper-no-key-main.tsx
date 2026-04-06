@@ -12,7 +12,6 @@ import {
   MapPolygon,
   MapPolyline,
   MapRectangle,
-  useGoogleMapsApi,
   type GoogleMapHandle
 } from '@revivejs/react-google-maps';
 import './wrapper-no-key.css';
@@ -34,44 +33,15 @@ const CLUSTER_POINTS = randomPoints(SAN_FRANCISCO, 24);
 const exampleId = new URLSearchParams(window.location.search).get('example') || 'basic-roadmap';
 
 type PreviewDefinition = {
-  title: string;
-  note: string;
   render: () => React.ReactNode;
 };
-
-function WrapperNoKeyStatus({ title, note }: { title: string; note: string }) {
-  const { status, error } = useGoogleMapsApi();
-
-  return (
-    <div className="wrapper-preview-status">
-      <span className="wrapper-preview-pill">wrapper no-key mode</span>
-      <strong>{title}</strong>
-      <p>{note}</p>
-      <p>
-        Status: <code>{status}</code>
-      </p>
-      {error ? <p className="wrapper-preview-error">Error: {error.message}</p> : null}
-    </div>
-  );
-}
 
 function WrapperNoKeyApp() {
   const preview = useMemo<PreviewDefinition>(() => getPreviewDefinition(exampleId), []);
 
   return (
     <GoogleMapsProvider>
-      <main className="wrapper-preview-shell">
-        <WrapperNoKeyStatus title={preview.title} note={preview.note} />
-        <div className="wrapper-preview-map-card">{preview.render()}</div>
-        <div className="wrapper-preview-note">
-          <strong>About this browser preview</strong>
-          <p>
-            This iframe uses the real wrapper with no key so the docs can still show an actual Google Maps surface
-            without destabilizing the main documentation shell. Scenarios that need extra Google APIs or a map ID fall
-            back to a safe base-map preview here.
-          </p>
-        </div>
-      </main>
+      <main className="wrapper-preview-shell">{preview.render()}</main>
     </GoogleMapsProvider>
   );
 }
@@ -80,14 +50,10 @@ function getPreviewDefinition(id: string): PreviewDefinition {
   switch (id) {
     case 'hero-showcase':
       return {
-        title: 'Hero showcase browser preview',
-        note: 'The docs open with an advanced-marker style browser preview so the first thing developers see is the richer marker model.',
         render: () => <AdvancedMarkersNoKeyPreview variant="hero" />
       };
     case 'basic-roadmap':
       return {
-        title: 'Basic map bootstrapping',
-        note: 'The smallest working no-key wrapper surface: one map and one marker.',
         render: () => (
           <GoogleMap center={NEW_YORK} zoom={11} height={460}>
             <MapMarker position={NEW_YORK} title="New York City" />
@@ -96,98 +62,66 @@ function getPreviewDefinition(id: string): PreviewDefinition {
       };
     case 'controlled-camera':
       return {
-        title: 'Controlled center and zoom',
-        note: 'A real no-key map that still lets you move the camera around from React state.',
         render: () => <ControlledNoKeyPreview />
       };
     case 'map-events':
       return {
-        title: 'Click events',
-        note: 'Drop markers on click to validate map events with the wrapper directly inside the no-key browser preview.',
         render: () => <ClickEventsNoKeyPreview />
       };
     case 'marker-info-window':
       return {
-        title: 'Markers and info windows',
-        note: 'Classic marker + info window behavior stays testable in the isolated no-key iframe.',
         render: () => <InfoWindowNoKeyPreview />
       };
     case 'advanced-markers':
       return {
-        title: 'Advanced markers',
-        note: 'This no-key preview uses a real base map with branded HTML marker cards layered on top, so the docs still communicate the advanced-marker mental model without credentials.',
         render: () => <AdvancedMarkersNoKeyPreview variant="workbench" />
       };
     case 'draggable-marker':
       return {
-        title: 'Draggable markers',
-        note: 'You can drag the marker and validate interaction directly in the no-key browser preview.',
         render: () => <DraggableNoKeyPreview />
       };
     case 'marker-clusterer':
       return {
-        title: 'Marker clustering',
-        note: 'Cluster many classic markers with the official clusterer package in an isolated no-key browser preview.',
         render: () => <ClusterNoKeyPreview />
       };
     case 'geometry-shapes':
       return {
-        title: 'Polylines, polygons, rectangles, circles',
-        note: 'A single geometry toolbox preview showing the four core shape components together on one real map.',
         render: () => <GeometryNoKeyPreview />
       };
     case 'ground-overlay':
       return {
-        title: 'Ground overlays',
-        note: 'Ground overlays still fit the wrapper mental model, so this preview keeps the base map visible and overlays a remote image.',
         render: () => <GroundOverlayNoKeyPreview />
       };
     case 'transport-layers':
       return {
-        title: 'Traffic, transit, and bicycling layers',
-        note: 'These Google-managed layers stay documented, but the no-key browser preview falls back to a stable base map surface.',
         render: () => <FallbackBaseMapPreview label="Transport layers use fallback preview" />
       };
     case 'kml-layer':
       return {
-        title: 'KML layers',
-        note: 'KML loading depends on Google services. The no-key browser preview keeps a stable base map visible while the docs explain the wrapper workflow.',
         render: () => <FallbackBaseMapPreview label="KML layers use fallback preview" />
       };
     case 'heatmap-layer':
       return {
-        title: 'Heatmaps',
-        note: 'Heatmaps depend on the visualization library, so the no-key browser preview uses a safe base map fallback.',
         render: () => <FallbackBaseMapPreview label="Heatmaps use fallback preview" />
       };
     case 'directions':
       return {
-        title: 'Directions',
-        note: 'Directions calls depend on Google services, so this no-key browser preview keeps the route stage visible with a safe base map fallback.',
         render: () => <FallbackBaseMapPreview label="Directions use fallback preview" />
       };
     case 'geocoder':
       return {
-        title: 'Geocoding',
-        note: 'Geocoding depends on Google services, so this no-key browser preview keeps a real map visible while the docs explain the hook usage.',
         render: () => <FallbackBaseMapPreview label="Geocoding uses fallback preview" />
       };
     case 'custom-cluster-html':
       return {
-        title: 'Advanced markers + custom cluster HTML',
-        note: 'Custom HTML cluster rendering is documented in the main page. The no-key iframe falls back to classic clustering to keep the map stable.',
         render: () => <ClusterNoKeyPreview />
       };
     case 'custom-control':
       return {
-        title: 'Custom map controls and fitBounds',
-        note: 'A compact control example still works well in no-key mode and keeps the imperative map handle visible.',
         render: () => <ControlNoKeyPreview />
       };
     default:
       return {
-        title: 'Wrapper no-key preview',
-        note: 'Fallback browser preview for the selected example.',
         render: () => <FallbackBaseMapPreview label="Preview fallback" />
       };
   }
@@ -260,20 +194,21 @@ function AdvancedMarkersNoKeyPreview({ variant }: { variant: 'hero' | 'workbench
 function ControlledNoKeyPreview() {
   const [center, setCenter] = useState(TORONTO);
   const [zoom, setZoom] = useState(10);
+  const topCenter = ((window as any).google?.maps?.ControlPosition?.TOP_CENTER ?? 2) as google.maps.ControlPosition;
 
   return (
-    <div className="wrapper-preview-stack">
-      <div className="wrapper-preview-toolbar">
-        <button type="button" onClick={() => setCenter(TORONTO)}>Toronto</button>
-        <button type="button" onClick={() => setCenter(MONTREAL)}>Montreal</button>
-        <button type="button" onClick={() => setCenter(OTTAWA)}>Ottawa</button>
-        <button type="button" onClick={() => setZoom((value) => Math.min(value + 1, 14))}>Zoom in</button>
-        <button type="button" onClick={() => setZoom((value) => Math.max(value - 1, 4))}>Zoom out</button>
-      </div>
-      <GoogleMap center={center} zoom={zoom} height={420}>
-        <MapMarker position={center} title="Selected city" />
-      </GoogleMap>
-    </div>
+    <GoogleMap center={center} zoom={zoom} height={420}>
+      <MapControl position={topCenter}>
+        <div className="wrapper-preview-toolbar">
+          <button type="button" onClick={() => setCenter(TORONTO)}>Toronto</button>
+          <button type="button" onClick={() => setCenter(MONTREAL)}>Montreal</button>
+          <button type="button" onClick={() => setCenter(OTTAWA)}>Ottawa</button>
+          <button type="button" onClick={() => setZoom((value) => Math.min(value + 1, 14))}>+</button>
+          <button type="button" onClick={() => setZoom((value) => Math.max(value - 1, 4))}>-</button>
+        </div>
+      </MapControl>
+      <MapMarker position={center} title="Selected city" />
+    </GoogleMap>
   );
 }
 
@@ -448,15 +383,12 @@ function ControlNoKeyPreview() {
 
 function FallbackBaseMapPreview({ label }: { label: string }) {
   return (
-    <div className="wrapper-preview-stack">
-      <div className="wrapper-preview-note wrapper-preview-note--inline">
-        <strong>{label}</strong>
-        <p>This specific scenario depends on extra Google APIs that are outside the no-key docs runtime. The base map stays visible here so the docs never feel blank.</p>
-      </div>
-      <GoogleMap center={NEW_YORK} zoom={10} height={420}>
-        <MapMarker position={NEW_YORK} title="New York City" />
-      </GoogleMap>
-    </div>
+    <GoogleMap center={NEW_YORK} zoom={10} height={420}>
+      <MapControl position={google.maps.ControlPosition.TOP_CENTER}>
+        <div className="wrapper-preview-tag">{label}</div>
+      </MapControl>
+      <MapMarker position={NEW_YORK} title="New York City" />
+    </GoogleMap>
   );
 }
 
