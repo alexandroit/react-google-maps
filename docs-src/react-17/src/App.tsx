@@ -215,7 +215,7 @@ export default function App({ reactLine, reactVersion, docsPath, packageVersion 
         ),
         render: ({ apiKey, mapId, pushLog }) => (
           <DemoSurface apiKey={apiKey} mapId={mapId}>
-            <GoogleMap center={TORONTO} zoom={11} height={420} onIdle={() => pushLog('Basic roadmap idle event fired.')}>
+            <GoogleMap center={TORONTO} zoom={11} height={420}>
               <MapMarker position={TORONTO} title="Toronto" onClick={() => pushLog('Toronto marker clicked.')} />
             </GoogleMap>
           </DemoSurface>
@@ -699,12 +699,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });`
                 </p>
                 <div className="quickstart-demo">
                   <DemoSurface apiKey={apiKey} mapId={mapId}>
-                    <GoogleMap
-                      center={NEW_YORK}
-                      zoom={11}
-                      height={420}
-                      onIdle={() => pushLog('Classic quick start map loaded.')}
-                    >
+                    <GoogleMap center={NEW_YORK} zoom={11} height={420}>
                       <MapMarker
                         position={NEW_YORK}
                         title="New York City"
@@ -1133,21 +1128,29 @@ function ControlledCameraExample({ apiKey, mapId, pushLog }: ExampleContext) {
   const [center, setCenter] = useState(TORONTO);
   const [zoom, setZoom] = useState(10);
 
+  function moveTo(nextCenter: typeof TORONTO, label: string) {
+    setCenter(nextCenter);
+    pushLog(`Moved camera to ${label}.`);
+  }
+
+  function updateZoom(delta: number) {
+    setZoom((current) => {
+      const nextZoom = Math.max(4, Math.min(current + delta, 15));
+      pushLog(`Changed zoom to ${nextZoom}.`);
+      return nextZoom;
+    });
+  }
+
   return (
     <DemoSurface apiKey={apiKey} mapId={mapId}>
       <div className="control-strip">
-        <button type="button" onClick={() => setCenter(TORONTO)}>Toronto</button>
-        <button type="button" onClick={() => setCenter(MONTREAL)}>Montreal</button>
-        <button type="button" onClick={() => setCenter(OTTAWA)}>Ottawa</button>
-        <button type="button" onClick={() => setZoom((current) => Math.min(current + 1, 15))}>Zoom in</button>
-        <button type="button" onClick={() => setZoom((current) => Math.max(current - 1, 4))}>Zoom out</button>
+        <button type="button" onClick={() => moveTo(TORONTO, 'Toronto')}>Toronto</button>
+        <button type="button" onClick={() => moveTo(MONTREAL, 'Montreal')}>Montreal</button>
+        <button type="button" onClick={() => moveTo(OTTAWA, 'Ottawa')}>Ottawa</button>
+        <button type="button" onClick={() => updateZoom(1)}>Zoom in</button>
+        <button type="button" onClick={() => updateZoom(-1)}>Zoom out</button>
       </div>
-      <GoogleMap
-        center={center}
-        zoom={zoom}
-        height={420}
-        onIdle={() => pushLog(`Camera settled at ${center.lat.toFixed(3)}, ${center.lng.toFixed(3)} / zoom ${zoom}.`)}
-      >
+      <GoogleMap center={center} zoom={zoom} height={420}>
         <MapMarker position={center} title="Controlled center" />
       </GoogleMap>
     </DemoSurface>
