@@ -81,8 +81,8 @@ function getPreviewDefinition(id: string): PreviewDefinition {
     case 'hero-showcase':
       return {
         title: 'Hero showcase browser preview',
-        note: 'A no-key visual preview with clusters and geometry so the top of the docs still opens with a real map.',
-        render: () => <HeroNoKeyPreview />
+        note: 'The docs open with an advanced-marker style browser preview so the first thing developers see is the richer marker model.',
+        render: () => <AdvancedMarkersNoKeyPreview variant="hero" />
       };
     case 'basic-roadmap':
       return {
@@ -115,8 +115,8 @@ function getPreviewDefinition(id: string): PreviewDefinition {
     case 'advanced-markers':
       return {
         title: 'Advanced markers',
-        note: 'Advanced markers are documented here, but the no-key browser preview falls back to a stable base map surface so the docs never go blank.',
-        render: () => <FallbackBaseMapPreview label="Advanced markers use fallback preview" />
+        note: 'This no-key preview uses a real base map with branded HTML marker cards layered on top, so the docs still communicate the advanced-marker mental model without credentials.',
+        render: () => <AdvancedMarkersNoKeyPreview variant="workbench" />
       };
     case 'draggable-marker':
       return {
@@ -226,6 +226,34 @@ function HeroNoKeyPreview() {
         ))}
       </MapMarkerClusterer>
     </GoogleMap>
+  );
+}
+
+function AdvancedMarkersNoKeyPreview({ variant }: { variant: 'hero' | 'workbench' }) {
+  return (
+    <div className={`wrapper-overlay-stage wrapper-overlay-stage--${variant}`}>
+      <GoogleMap center={OTTAWA} zoom={6} height={variant === 'hero' ? 460 : 420}>
+        <MapMarker position={OTTAWA} title="Ottawa anchor" />
+        <MapMarker position={MONTREAL} title="Montreal anchor" />
+      </GoogleMap>
+
+      <div className="wrapper-advanced-card wrapper-advanced-card--a">
+        <strong>Ottawa</strong>
+        <span>Advanced marker card</span>
+      </div>
+
+      <div className="wrapper-advanced-card wrapper-advanced-card--b">
+        <strong>Montreal</strong>
+        <span>HTML marker content</span>
+      </div>
+
+      {variant === 'hero' ? (
+        <div className="wrapper-advanced-card wrapper-advanced-card--c">
+          <strong>Toronto</strong>
+          <span>Docs first-look marker</span>
+        </div>
+      ) : null}
+    </div>
   );
 }
 

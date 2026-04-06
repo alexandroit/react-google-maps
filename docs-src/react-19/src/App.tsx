@@ -183,7 +183,7 @@ const DOC_SECTIONS = [
 ] as const;
 
 export default function App({ reactLine, reactVersion, docsPath, packageVersion }: AppProps) {
-  const [selectedId, setSelectedId] = useState('basic-roadmap');
+  const [selectedId, setSelectedId] = useState('advanced-markers');
   const [logEntries, setLogEntries] = useState<string[]>(() => [
     stamp(`No-key browser preview mode active.`),
     stamp(`Loaded docs line ${reactLine}.`)
