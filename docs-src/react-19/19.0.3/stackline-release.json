@@ -1,0 +1,18 @@
+{
+  "packageName": "@stackline/react-google-maps",
+  "projectRoot": "react-google-maps/comp/components-main/src/google-maps/react-google-maps",
+  "framework": "react",
+  "family": "react-19",
+  "major": 19,
+  "exactVersion": "19.0.3",
+  "installMode": "npm-install",
+  "localInstallSource": "../../..",
+  "expectedExports": [
+    "GoogleMap",
+    "GoogleMapsProvider"
+  ],
+  "installCommand": "npm install --ignore-scripts",
+  "validateCommand": "npm run validate",
+  "buildCommand": "npm run build",
+  "generatedAt": "2026-04-08T22:13:17.331Z"
+}

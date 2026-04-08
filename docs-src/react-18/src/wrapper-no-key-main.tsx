@@ -10,7 +10,7 @@ import {
   MapPolyline,
   MapRectangle,
   type GoogleMapHandle
-} from '@revivejs/react-google-maps';
+} from '@stackline/react-google-maps';
 import './wrapper-no-key.css';
 
 const TORONTO = { lat: 43.6532, lng: -79.3832 };

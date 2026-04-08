@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { GoogleMap, GoogleMapsProvider, MapMarker, useGoogleMapsApi } from '@revivejs/react-google-maps';
+import { GoogleMap, GoogleMapsProvider, MapMarker, useGoogleMapsApi } from '@stackline/react-google-maps';
 import './wrapper-no-key.css';
 
 const NEW_YORK = { lat: 40.7128, lng: -74.006 };

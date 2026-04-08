@@ -1,0 +1,12 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "noEmit": true,
+    "types": ["vite/client"],
+    "paths": {
+      "@stackline/react-google-maps": ["../../../../src/index.ts"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}

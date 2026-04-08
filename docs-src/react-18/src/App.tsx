@@ -23,7 +23,7 @@ import {
   useMapGeocoder,
   type DirectionsServiceResult,
   type GoogleMapHandle
-} from '@revivejs/react-google-maps';
+} from '@stackline/react-google-maps';
 
 type AppProps = {
   reactLine: string;
@@ -47,9 +47,9 @@ type ExampleContext = {
 
 const DEFAULT_MAP_ID = 'DEMO_MAP_ID';
 
-const INSTALL_CODE = `npm install @revivejs/react-google-maps`;
+const INSTALL_CODE = `npm install @stackline/react-google-maps@18`;
 
-const PROVIDER_CODE = `import { GoogleMapsProvider } from '@revivejs/react-google-maps';
+const PROVIDER_CODE = `import { GoogleMapsProvider } from '@stackline/react-google-maps';
 
 function App() {
   return (
@@ -63,7 +63,7 @@ function App() {
   );
 }`;
 
-const PROVIDER_ONLY_CODE = `import { GoogleMapsProvider } from '@revivejs/react-google-maps';
+const PROVIDER_ONLY_CODE = `import { GoogleMapsProvider } from '@stackline/react-google-maps';
 
 function Root() {
   return (
@@ -77,7 +77,7 @@ function Root() {
   );
 }`;
 
-const MAP_RENDER_CODE = `import { GoogleMap, MapAdvancedMarker } from '@revivejs/react-google-maps';
+const MAP_RENDER_CODE = `import { GoogleMap, MapAdvancedMarker } from '@stackline/react-google-maps';
 
 const center = { lat: 40.7128, lng: -74.006 };
 
@@ -94,7 +94,7 @@ function BasicMap() {
   );
 }`;
 
-const CLASSIC_EXAMPLE_CODE = `import { GoogleMapsProvider, GoogleMap, MapAdvancedMarker } from '@revivejs/react-google-maps';
+const CLASSIC_EXAMPLE_CODE = `import { GoogleMapsProvider, GoogleMap, MapAdvancedMarker } from '@stackline/react-google-maps';
 
 const center = { lat: 40.7128, lng: -74.006 };
 
@@ -142,7 +142,7 @@ mapRef.current?.fitBounds(bounds);
 markerRef.current?.setPosition(nextPoint);
 markerRef.current?.setZIndex(40);`;
 
-const CLUSTER_HELPER_CODE = `import { createClusterRenderer } from '@revivejs/react-google-maps';
+const CLUSTER_HELPER_CODE = `import { createClusterRenderer } from '@stackline/react-google-maps';
 
 const renderer = createClusterRenderer({
   render: ({ count }) => {
@@ -527,7 +527,7 @@ const response = await geocoder?.geocode({ address: 'Toronto City Hall' });
       <section className="hero" id="overview">
         <div className="hero-card hero-main">
           <span className="badge">{reactLine} · GOOGLE MAPS · MARKERCLUSTERER</span>
-          <h1>@revivejs/react-google-maps</h1>
+          <h1>@stackline/react-google-maps</h1>
           <p>
             A React wrapper for the Google Maps JavaScript API with declarative
             maps, markers, advanced markers, info windows, shapes, services, layers, and official

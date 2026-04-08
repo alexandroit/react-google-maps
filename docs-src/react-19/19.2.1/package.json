@@ -1,0 +1,14 @@
+{
+  "name": "@stackline/react-google-maps-docs-react19-19-2-1",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "validate": "node ./stackline-validate.mjs"
+  },
+  "dependencies": {
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "@stackline/react-google-maps": "file:../../.."
+  },
+  "devDependencies": {}
+}
