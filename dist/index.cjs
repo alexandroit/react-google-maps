@@ -75,7 +75,7 @@ function getDefaultGoogleMapsLibraries() {
 }
 function loadGoogleMapsApi(options) {
   if (typeof window === "undefined" || typeof document === "undefined") {
-    return Promise.reject(new Error("@revivejs/react-google-maps can only load the Google Maps API in a browser environment."));
+    return Promise.reject(new Error("@stackline/react-google-maps can only load the Google Maps API in a browser environment."));
   }
   if (window.google?.maps) {
     return Promise.resolve(window.google);
@@ -85,7 +85,7 @@ function loadGoogleMapsApi(options) {
   if (loaderPromise) {
     if (loadedOptionsKey && loadedOptionsKey !== nextKey) {
       console.warn(
-        "@revivejs/react-google-maps only loads the Google Maps JavaScript API once per page. Ignoring subsequent loader options and reusing the first loaded configuration."
+        "@stackline/react-google-maps only loads the Google Maps JavaScript API once per page. Ignoring subsequent loader options and reusing the first loaded configuration."
       );
     }
     return loaderPromise;
