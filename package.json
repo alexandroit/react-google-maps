@@ -57,7 +57,8 @@
     "build:docs:react-18": "cd docs-src/react-18 && npm run build",
     "build:docs:react-19": "cd docs-src/react-19 && npm run build",
     "build:docs": "npm run build:docs:react-19",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.cjs"
   },
   "peerDependencies": {
     "react": ">=19.0.0 <20.0.0",
