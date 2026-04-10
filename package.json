@@ -1,6 +1,6 @@
 {
   "name": "@stackline/react-google-maps",
-  "version": "19.0.1",
+  "version": "19.0.0",
   "description": "A maintained React 19 wrapper for the Google Maps JavaScript API with versioned docs, marker clustering, and migration-friendly components.",
   "keywords": [
     "react",
@@ -18,7 +18,7 @@
     "google-maps-react",
     "wrapper",
     "ui-component",
-    "revived",
+    "maintained",
     "maintained"
   ],
   "homepage": "https://alexandroit.github.io/react-google-maps/",

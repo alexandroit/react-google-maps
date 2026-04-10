@@ -99,7 +99,7 @@ function buildAdvancedClusterContent(
   }
 
   const element = document.createElement('div');
-  element.className = options.className || 'revivejs-cluster-badge';
+  element.className = options.className || 'stackline-cluster-badge';
   element.style.display = 'grid';
   element.style.gap = '2px';
   element.style.minWidth = '52px';

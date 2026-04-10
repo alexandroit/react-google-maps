@@ -92,8 +92,8 @@ function loadGoogleMapsApi(options) {
   }
   loadedOptionsKey = nextKey;
   loaderPromise = new Promise((resolve, reject) => {
-    const callbackName = "__revivejsReactGoogleMapsInit";
-    const existingScript = document.querySelector('script[data-revivejs-google-maps-loader="true"]');
+    const callbackName = "__stacklineReactGoogleMapsInit";
+    const existingScript = document.querySelector('script[data-stackline-google-maps-loader="true"]');
     if (existingScript) {
       existingScript.addEventListener("load", () => {
         if (window.google?.maps) {
@@ -134,7 +134,7 @@ function loadGoogleMapsApi(options) {
     const script = document.createElement("script");
     script.async = true;
     script.defer = true;
-    script.dataset.revivejsGoogleMapsLoader = "true";
+    script.dataset.stacklineGoogleMapsLoader = "true";
     script.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
     if (normalizedOptions.nonce) {
       script.nonce = normalizedOptions.nonce;
@@ -271,7 +271,7 @@ function buildAdvancedClusterContent(context, options) {
     return customContent;
   }
   const element = document.createElement("div");
-  element.className = options.className || "revivejs-cluster-badge";
+  element.className = options.className || "stackline-cluster-badge";
   element.style.display = "grid";
   element.style.gap = "2px";
   element.style.minWidth = "52px";

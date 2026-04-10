@@ -10,7 +10,7 @@
 
 **[Documentation & Live Demos](https://alexandroit.github.io/react-google-maps/)** | **[npm](https://www.npmjs.com/package/@stackline/react-google-maps)** | **[Issues](https://github.com/alexandroit/react-google-maps/issues)** | **[Repository](https://github.com/alexandroit/react-google-maps)**
 
-**Latest version:** `19.0.1`
+**Latest version:** `19.0.0`
 
 ## Why this library?
 

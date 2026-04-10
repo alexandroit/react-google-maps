@@ -46,8 +46,8 @@ export function loadGoogleMapsApi(options: GoogleMapsApiLoadOptions): Promise<ty
   loadedOptionsKey = nextKey;
 
   loaderPromise = new Promise<typeof google>((resolve, reject) => {
-    const callbackName = '__revivejsReactGoogleMapsInit';
-    const existingScript = document.querySelector<HTMLScriptElement>('script[data-revivejs-google-maps-loader="true"]');
+    const callbackName = '__stacklineReactGoogleMapsInit';
+    const existingScript = document.querySelector<HTMLScriptElement>('script[data-stackline-google-maps-loader="true"]');
 
     if (existingScript) {
       existingScript.addEventListener('load', () => {
@@ -92,7 +92,7 @@ export function loadGoogleMapsApi(options: GoogleMapsApiLoadOptions): Promise<ty
     const script = document.createElement('script');
     script.async = true;
     script.defer = true;
-    script.dataset.revivejsGoogleMapsLoader = 'true';
+    script.dataset.stacklineGoogleMapsLoader = 'true';
     script.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
 
     if (normalizedOptions.nonce) {
