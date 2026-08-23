@@ -10,6 +10,11 @@ updates:
     versioning-strategy: increase-if-necessary
     commit-message:
       prefix: deps
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
+      - dependency-name: "@types/google.maps"
     groups:
       production-compatible:
         dependency-type: production
@@ -35,4 +40,3 @@ updates:
       github-actions:
         patterns:
           - "*"
-
