@@ -276,3 +276,12 @@ The live docs are intentionally rich and mirror the kinds of workflows developer
 
 ### 17.0.0
 - React 17 compatibility line
+
+## Security
+
+Report vulnerabilities privately by following [SECURITY.md](SECURITY.md). Do
+not disclose exploit details in a public issue.
+
+## License
+
+Licensed under the MIT License. See [LICENSE](LICENSE).
