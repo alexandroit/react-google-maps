@@ -70,11 +70,11 @@
     "@googlemaps/markerclusterer": "2.6.2"
   },
   "devDependencies": {
-    "@types/google.maps": "3.58.1",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "@types/google.maps": "3.65.5",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "tsup": "8.5.1",
     "typescript": "5.9.3"
   },
