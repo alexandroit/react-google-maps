@@ -4,6 +4,9 @@ All notable changes to `@stackline/react-google-maps` are documented here.
 
 ## [Unreleased]
 
+- Updated all React 17, 18, and 19 documentation apps to the patched Vite 8.2
+  toolchain, committed reproducible lockfiles, and added their builds and
+  dependency audits to CI.
 - Moved exact-version dependency records to `package.fixture.json`, repaired
   their validators, and added an offline catalog contract to keep historical
   metadata out of active dependency alerts.
