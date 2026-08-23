@@ -4,6 +4,9 @@ All notable changes to `@stackline/react-google-maps` are documented here.
 
 ## [Unreleased]
 
+- Moved exact-version dependency records to `package.fixture.json`, repaired
+  their validators, and added an offline catalog contract to keep historical
+  metadata out of active dependency alerts.
 - Forced tsup's nested esbuild onto the patched release line.
 - Added a package-specific security policy and confidential reporting path.
 - Added reproducible CI packaging and a manual npm provenance release workflow.

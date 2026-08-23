@@ -29,6 +29,9 @@ jobs:
           cache: npm
           registry-url: https://registry.npmjs.org
       - run: npm ci
+      - name: Validate compatibility fixture catalog
+        if: matrix.node == '22.22.3'
+        run: npm run test:fixtures
       - run: npm run typecheck --if-present
       - run: npm test
       - run: npm run build
